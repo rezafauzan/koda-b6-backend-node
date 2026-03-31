@@ -68,3 +68,26 @@ export async function deleteUser(request, respond){
         })
     }
 }
+
+/**
+ * 
+ * @param {import("express").Request} request 
+ * @param {import("express").Response} respond 
+ */
+export async function updateUser(request, respond){
+    try {
+        const user = await userModel.updateUser(request.params.id, request.body)
+        respond.json({
+            success: true,
+            message: "Update users success !",
+            result: user
+        })
+        
+    } catch (error) {
+        respond.json({
+            success: true,
+            message: "Update users fail !" + error,
+            result: null
+        })
+    }
+}
