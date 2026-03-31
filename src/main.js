@@ -1,5 +1,6 @@
 import express from "express"
 import {constants} from "node:http2"
+import authRouter from "./routes/auth.router.js"
 import userRouter from "./routes/users.router.js"
 
 const app = express()
@@ -16,7 +17,8 @@ app.get("/", function(request, respond){
     })
 })
 
-app.use("/users", userRouter)
+app.use("/auth", authRouter)
+app.use("/admin/users", userRouter)
 
 app.listen(port, function(){
     console.log(`App listening on port ${port}`)
