@@ -6,5 +6,6 @@ const userRouter = Router()
 userRouter.get("", userController.getAllUsers)
 userRouter.post("", userController.createUsers)
 userRouter.delete("/:id", userController.deleteUser)
+userRouter.patch("/:id", userController.updateUser)
 
 export default userRouter
