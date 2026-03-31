@@ -3,11 +3,11 @@ import * as userModel from "../models/users.model.js"
 /**
  * 
  * @param {import("express").Request} request 
- * @param {import("express").Response} respond 
+ * @param {import("express").Response} response 
  */
-export async function getAllUsers(request, respond){
+export async function getAllUsers(request, response){
     const users = await userModel.getAllUsers()
-    respond.json({
+    response.json({
         success: true,
         message: "Get all users data",
         result: users
