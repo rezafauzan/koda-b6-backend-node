@@ -90,7 +90,7 @@ export async function getUserByEmail(email) {
     if (foundIndex !== -1) {
         return [usersData[foundIndex], foundIndex]
     } else {
-        throw new Error("Users not found !");
+        return [null, null]
     }
 }
 
