@@ -9,16 +9,56 @@
  * @type {User[]}
  */
 const usersData = [
-    { email: "reza.fauzan@example.com", password: "Test1234" },
-    { email: "someone.love@example.com", password: "Test1234" },
-    { email: "orang.khayalan@example.com", password: "Test1234" },
-    { email: "lumba.lumba@example.com", password: "Test1234" },
-    { email: "kucing.putih@example.com", password: "Test1234" },
-    { email: "kucing.langit@example.com", password: "Test1234" },
-    { email: "kucing.hallo@example.com", password: "Test1234" },
-    { email: "orang.asing@example.com", password: "Test1234" },
-    { email: "george.harris@example.com", password: "Test1234" },
-    { email: "hannah.clark@example.com", password: "Test1234" }
+    {
+        id: 1,
+        email: "reza.fauzan@example.com",
+        password: "Test1234"
+    },
+    {
+        id: 2,
+        email: "someone.love@example.com",
+        password: "Test1234"
+    },
+    {
+        id: 3,
+        email: "orang.khayalan@example.com",
+        password: "Test1234"
+    },
+    {
+        id: 4,
+        email: "lumba.lumba@example.com",
+        password: "Test1234"
+    },
+    {
+        id: 5,
+        email: "kucing.putih@example.com",
+        password: "Test1234"
+    },
+    {
+        id: 6,
+        email: "kucing.langit@example.com",
+        password: "Test1234"
+    },
+    {
+        id: 7,
+        email: "kucing.hallo@example.com",
+        password: "Test1234"
+    },
+    {
+        id: 8,
+        email: "orang.asing@example.com",
+        password: "Test1234"
+    },
+    {
+        id: 9,
+        email: "george.harris@example.com",
+        password: "Test1234"
+    },
+    {
+        id: 10,
+        email: "hannah.clark@example.com",
+        password: "Test1234"
+    }
 ]
 
 export async function getAllUsers() {
@@ -30,10 +70,10 @@ export async function getAllUsers() {
  * @returns {User}
  */
 export async function getUserById(id) {
-    const foundIndex = usersData.findIndex(user => user.id === id)
+    const foundIndex = usersData.findIndex(user => user.id === parseInt(id))
 
     if (foundIndex !== -1) {
-        return usersData[foundIndex]
+        return [usersData[foundIndex], foundIndex]
     } else {
         throw new Error("Users not found !");
     }
@@ -45,8 +85,9 @@ export async function getUserById(id) {
  * @returns 
  */
 export async function createUsers(data) {
+    data.id = usersData[usersData.length - 1].id + 1
     usersData.push(data)
-    return usersData
+    return data
 }
 
 /**
@@ -54,13 +95,13 @@ export async function createUsers(data) {
  * @param {number} id 
  * @param {User} data 
  */
-export async function updateUser(id, data) {
+export async function updateUser(id, newData) {
     const foundIndex = usersData.findIndex(user => user.id === id)
 
     if (foundIndex !== -1) {
         usersData[foundIndex] = {
             ...usersData[foundIndex],
-            ...data
+            ...newData
         }
 
         return usersData[foundIndex]
@@ -70,5 +111,7 @@ export async function updateUser(id, data) {
 }
 
 export async function deleteUser(id) {
-    const user = getUserById(id)
+    const [user, index] = await getUserById(id)
+    usersData.splice(index, 1)
+    return user
 }
