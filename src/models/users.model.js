@@ -79,6 +79,11 @@ export async function getUserById(id) {
     }
 }
 
+/**
+ * 
+ * @param {string} email 
+ * @returns {User}
+ */
 export async function getUserByEmail(email) {
     const foundIndex = usersData.findIndex(user => user.email === email)
 
