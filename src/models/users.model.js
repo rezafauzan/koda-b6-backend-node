@@ -79,6 +79,16 @@ export async function getUserById(id) {
     }
 }
 
+export async function getUserByEmail(email) {
+    const foundIndex = usersData.findIndex(user => user.email === email)
+
+    if (foundIndex !== -1) {
+        return [usersData[foundIndex], foundIndex]
+    } else {
+        throw new Error("Users not found !");
+    }
+}
+
 /**
  * 
  * @param {User} data 
