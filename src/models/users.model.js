@@ -96,7 +96,7 @@ export async function createUsers(data) {
  * @param {User} data 
  */
 export async function updateUser(id, newData) {
-    const foundIndex = usersData.findIndex(user => user.id === id)
+    const foundIndex = usersData.findIndex(user => user.id === parseInt(id))
 
     if (foundIndex !== -1) {
         usersData[foundIndex] = {
