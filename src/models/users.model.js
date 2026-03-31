@@ -19,7 +19,7 @@ const usersData = [
     { email: "orang.asing@example.com", password: "Test1234" },
     { email: "george.harris@example.com", password: "Test1234" },
     { email: "hannah.clark@example.com", password: "Test1234" }
-];
+]
 
 export async function getAllUsers() {
     return usersData
