@@ -1,9 +1,9 @@
 import express from "express"
 import {constants} from "node:http2"
-import userRouter from "./routes/users.router"
+import userRouter from "./routes/users.router.js"
 
 const app = express()
-const port = 8888
+const port = process.env.PORT || 8888
 
 app.use(express.json())
 
