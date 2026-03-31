@@ -17,12 +17,12 @@ export async function getAllUsers(request, response){
 /**
  * 
  * @param {import("express").Request} request 
- * @param {import("express").Response} respond 
+ * @param {import("express").Response} response 
  */
-export async function createUsers(request, respond){
+export async function createUsers(request, response){
     const data = request.body
     if(!data.email.includes("@")){
-        respond.json({
+        response.json({
             success: false,
             message: "Create user failed : Invalid email",
             result: null
@@ -30,7 +30,7 @@ export async function createUsers(request, respond){
         return
     }
     if(!data.password.length >= 8){
-        respond.json({
+        response.json({
             success: false,
             message: "Create user failed : Password too weak! minimum 8 characters",
             result: null
@@ -39,7 +39,7 @@ export async function createUsers(request, respond){
     }
 
     const users = await userModel.createUsers(data)
-    respond.json({
+    response.json({
         success: true,
         message: "Create user success !",
         result: users
@@ -49,19 +49,19 @@ export async function createUsers(request, respond){
 /**
  * 
  * @param {import("express").Request} request 
- * @param {import("express").Response} respond 
+ * @param {import("express").Response} response 
  */
-export async function deleteUser(request, respond){
+export async function deleteUser(request, response){
     try {
         const user = await userModel.deleteUser(request.params.id)
-        respond.json({
+        response.json({
             success: true,
             message: "Delete users success !",
             result: user
         })
         
     } catch (error) {
-        respond.json({
+        response.json({
             success: true,
             message: "Delete users fail !" + error,
             result: null
@@ -72,19 +72,19 @@ export async function deleteUser(request, respond){
 /**
  * 
  * @param {import("express").Request} request 
- * @param {import("express").Response} respond 
+ * @param {import("express").Response} response 
  */
-export async function updateUser(request, respond){
+export async function updateUser(request, response){
     try {
         const user = await userModel.updateUser(request.params.id, request.body)
-        respond.json({
+        response.json({
             success: true,
             message: "Update users success !",
             result: user
         })
         
     } catch (error) {
-        respond.json({
+        response.json({
             success: true,
             message: "Update users fail !" + error,
             result: null
