@@ -5,6 +5,8 @@
  * @property {string} password
  */
 
+import db from "../lib/db.js"
+
 /**
  * @type {User[]}
  */
@@ -62,6 +64,7 @@ const usersData = [
 ]
 
 export async function getAllUsers() {
+    db().query("SELECT * FROM users")
     return usersData
 }
 
