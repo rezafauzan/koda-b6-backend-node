@@ -1,3 +1,4 @@
+import { GenerateHash } from "../lib/hash.js"
 import * as userModel from "../models/users.model.js"
 
 /**
@@ -37,6 +38,8 @@ export async function createUsers(request, response){
         })
         return
     }
+
+    data.password = await GenerateHash(data.password)
 
     const users = await userModel.createUsers(data)
     response.json({
