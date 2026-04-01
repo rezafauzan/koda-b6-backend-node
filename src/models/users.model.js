@@ -1,71 +1,21 @@
-/**
- * @typedef {Object} User
- * @property {number} id
- * @property {string} email
- * @property {string} password
- */
-
 import db from "../lib/db.js"
 
 /**
- * @type {User[]}
+ * @typedef {Object} User
+ * @property {number} id
+ * @property {number} role_id
+ * @property {boolean} verified
+ * @property {string} created_at
+ * @property {string} updated_at
  */
-const usersData = [
-    {
-        id: 1,
-        email: "reza.fauzan@example.com",
-        password: "Test1234"
-    },
-    {
-        id: 2,
-        email: "someone.love@example.com",
-        password: "Test1234"
-    },
-    {
-        id: 3,
-        email: "orang.khayalan@example.com",
-        password: "Test1234"
-    },
-    {
-        id: 4,
-        email: "lumba.lumba@example.com",
-        password: "Test1234"
-    },
-    {
-        id: 5,
-        email: "kucing.putih@example.com",
-        password: "Test1234"
-    },
-    {
-        id: 6,
-        email: "kucing.langit@example.com",
-        password: "Test1234"
-    },
-    {
-        id: 7,
-        email: "kucing.hallo@example.com",
-        password: "Test1234"
-    },
-    {
-        id: 8,
-        email: "orang.asing@example.com",
-        password: "Test1234"
-    },
-    {
-        id: 9,
-        email: "george.harris@example.com",
-        password: "Test1234"
-    },
-    {
-        id: 10,
-        email: "hannah.clark@example.com",
-        password: "Test1234"
-    }
-]
 
+/**
+ * @return {User[]}
+ */
 export async function getAllUsers() {
-    db().query("SELECT * FROM users")
-    return usersData
+    const sql = "SELECT users.id, user_profiles.user_avatar, user_profiles.first_name, user_profiles.last_name, user_credentials.email, user_credentials.phone, user_profiles.address, users.verified, roles.role_name, users.created_at, users.updated_at FROM users JOIN roles ON roles.id = users.role_id JOIN user_profiles ON user_profiles.user_id = users.id JOIN user_credentials ON user_credentials.user_id = users.id"
+    const rows = await (await db().query("SELECT * FROM users")).rows
+    return rows
 }
 
 /**
@@ -73,6 +23,7 @@ export async function getAllUsers() {
  * @returns {User}
  */
 export async function getUserById(id) {
+
     const foundIndex = usersData.findIndex(user => user.id === parseInt(id))
 
     if (foundIndex !== -1) {
@@ -102,10 +53,13 @@ export async function getUserByEmail(email) {
  * @param {User} data 
  * @returns 
  */
-export async function createUsers(data) {
-    data.id = usersData[usersData.length - 1].id + 1
-    usersData.push(data)
-    return data
+export async function createUsers() {
+    const sql = `INSERT INTO users (role_id, verified) VALUES ($1, $2) RETURNING id, role_id, verified, created_at, updated_at;`
+    const role_id = 2
+    const verified = true
+    const data = [role_id, verified]
+    const result = await db().query(sql, data)
+    return result.rows
 }
 
 /**

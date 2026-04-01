@@ -21,27 +21,28 @@ export async function getAllUsers(request, response){
  * @param {import("express").Response} response 
  */
 export async function createUsers(request, response){
-    const data = request.body
-    if(!data.email.includes("@")){
-        response.json({
-            success: false,
-            message: "Create user failed : Invalid email",
-            result: null
-        })
-        return
-    }
-    if(!data.password.length >= 8){
-        response.json({
-            success: false,
-            message: "Create user failed : Password too weak! minimum 8 characters",
-            result: null
-        })
-        return
-    }
+    // const data = request.body
+    // if(!data.email.includes("@")){
+    //     response.json({
+    //         success: false,
+    //         message: "Create user failed : Invalid email",
+    //         result: null
+    //     })
+    //     return
+    // }
+    // if(!data.password.length >= 8){
+    //     response.json({
+    //         success: false,
+    //         message: "Create user failed : Password too weak! minimum 8 characters",
+    //         result: null
+    //     })
+    //     return
+    // }
 
-    data.password = await GenerateHash(data.password)
+    // data.password = await GenerateHash(data.password)
 
-    const users = await userModel.createUsers(data)
+    // const users = await userModel.createUsers(data)
+    const users = await userModel.createUsers()
     response.json({
         success: true,
         message: "Create user success !",
