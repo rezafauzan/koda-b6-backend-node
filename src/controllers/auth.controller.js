@@ -1,4 +1,6 @@
 import * as userModel from "../models/users.model.js"
+import {generateToken} from "../lib/jwt.js"
+import { GenerateHash, VerifyHash } from "../lib/hash.js"
 
 /**
  * 
@@ -20,8 +22,8 @@ export async function login(request, response) {
                 )
                 return
             }
-
-            if (user.password !== password) {
+            
+            if (!(await VerifyHash(user.password, password))) {
                 response.json(
                     {
                         success: false,
@@ -32,11 +34,13 @@ export async function login(request, response) {
                 return
             }
 
+            const token = generateToken({id: user.id})
+
             response.json(
                 {
                     success: true,
                     messages: "Login success!",
-                    result: user
+                    result: token
                 }
             )
         } catch (error) {
@@ -94,10 +98,13 @@ export async function register(request, response) {
         )
         return
     }
-    const newUser = await userModel.createUsers({email, password})
+    const hashedPassword = await GenerateHash(password)
+
+    const newUser = await userModel.createUsers({email, password: hashedPassword})
+    const token = await generateToken({user_id: newUser.id})
     response.json({
         success: true,
         message: "Register success!",
-        result: newUser
+        result: token
     })
 }
