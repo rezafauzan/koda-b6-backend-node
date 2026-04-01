@@ -1,7 +1,7 @@
-import { Client } from "pg";
+import { Pool } from "pg";
 
-const client = new Pool()
+const pool = new Pool()
 
 export default function db(){
-    return client
+    return pool
 }
