@@ -6,7 +6,7 @@ import * as userModel from "../models/users.model.js"
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
-export async function getAllUsers(request, response){
+export async function getAllUsers(request, response) {
     const users = await userModel.getAllUsers()
     response.json({
         success: true,
@@ -20,34 +20,91 @@ export async function getAllUsers(request, response){
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
-export async function createUsers(request, response){
-    // const data = request.body
-    // if(!data.email.includes("@")){
-    //     response.json({
-    //         success: false,
-    //         message: "Create user failed : Invalid email",
-    //         result: null
-    //     })
-    //     return
-    // }
-    // if(!data.password.length >= 8){
-    //     response.json({
-    //         success: false,
-    //         message: "Create user failed : Password too weak! minimum 8 characters",
-    //         result: null
-    //     })
-    //     return
-    // }
+export async function createUsers(request, response) {
+    const { first_name, last_name, address, phone, email, password, confirm_password } = request.body
 
-    // data.password = await GenerateHash(data.password)
+    if (!first_name || first_name.length < 4) {
+        response.json({
+            success: false,
+            message: "Create user failed : First Name minimum 4 characters",
+            result: null
+        })
+        return
+    }
 
-    // const users = await userModel.createUsers(data)
-    const users = await userModel.createUsers()
-    response.json({
-        success: true,
-        message: "Create user success !",
-        result: users
-    })
+    if (!last_name || last_name.length < 4) {
+        response.json({
+            success: false,
+            message: "Create user failed :Last Name minimum 4 characters",
+            result: null
+        })
+        return
+    }
+
+    if (!phone || phone.length < 10) {
+        response.json({
+            success: false,
+            message: "Create user failed : Phone Number minimum 10 digits",
+            result: null
+        })
+        return
+    }
+
+    if (!address || address.length < 10) {
+        response.json({
+            success: false,
+            message: "Create user failed : Address minimum 10 characters",
+            result: null
+        })
+        return
+    }
+
+    if (!email.includes("@")) {
+        response.json({
+            success: false,
+            message: "Create user failed : Invalid email",
+            result: null
+        })
+        return
+    }
+
+    if (!password || password.length < 8) {
+        response.json({
+            success: false,
+            message: "Create user failed : Password too weak! minimum 8 characters",
+            result: null
+        })
+        return
+    }
+
+    if (confirm_password !== password) {
+        response.json({
+            success: false,
+            message: "Create user failed : Confirm password not match",
+            result: null
+        })
+        return
+    }
+
+    const hashedPassword = await GenerateHash(password)
+    try {
+        const registeredUser = await userModel.createUsersWithProfileAndCredentials({ first_name, last_name, address }, { email, phone, password: hashedPassword })
+        if (!registeredUser) {
+            throw new Error("Create user transaction fail!");
+        }
+
+        response.json({
+            success: true,
+            message: "Create user success !",
+            result: registeredUser
+        })
+    } catch (error) {
+        response.json({
+            success: true,
+            message: "Create users fail !" + error,
+            result: null
+        })
+    }
 }
 
 /**
@@ -55,7 +112,7 @@ export async function createUsers(request, response){
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
-export async function deleteUser(request, response){
+export async function deleteUser(request, response) {
     try {
         const user = await userModel.deleteUser(request.params.id)
         response.json({
@@ -63,7 +120,7 @@ export async function deleteUser(request, response){
             message: "Delete users success !",
             result: user
         })
-        
+
     } catch (error) {
         response.json({
             success: true,
@@ -78,7 +135,7 @@ export async function deleteUser(request, response){
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
-export async function updateUser(request, response){
+export async function updateUser(request, response) {
     try {
         const user = await userModel.updateUser(request.params.id, request.body)
         response.json({
@@ -86,7 +143,7 @@ export async function updateUser(request, response){
             message: "Update users success !",
             result: user
         })
-        
+
     } catch (error) {
         response.json({
             success: true,
