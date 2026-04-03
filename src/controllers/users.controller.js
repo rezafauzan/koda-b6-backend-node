@@ -1,4 +1,5 @@
 import { GenerateHash } from "../lib/hash.js"
+import * as userCredentialsModel from "../models/user_credentials.model.js"
 import * as userModel from "../models/users.model.js"
 
 /**
@@ -85,6 +86,7 @@ export async function createUsers(request, response) {
         })
         return
     }
+
     try {
         const user = await userCredentialsModel.getUserCredentialsByEmail(email);
 
@@ -95,9 +97,7 @@ export async function createUsers(request, response) {
                 results: null
             });
         }
-    } catch { }
 
-    try {
         const hashedPassword = await GenerateHash(password)
         const registeredUser = await userModel.createUsersWithProfileAndCredentials({ first_name, last_name, address }, { email, phone, password: hashedPassword })
         if (!registeredUser) {

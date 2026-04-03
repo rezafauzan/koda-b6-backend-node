@@ -74,7 +74,7 @@ export async function register(request, response) {
     if (first_name === undefined || first_name.length < 4) {
         response.json({
             success: false,
-            message: "Create user failed : First Name minimum 4 characters",
+            message: "Register failed : First Name minimum 4 characters",
             result: null
         })
         return
@@ -83,7 +83,7 @@ export async function register(request, response) {
     if (last_name === undefined || last_name.length < 4) {
         response.json({
             success: false,
-            message: "Create user failed :Last Name minimum 4 characters",
+            message: "Register failed :Last Name minimum 4 characters",
             result: null
         })
         return
@@ -92,7 +92,7 @@ export async function register(request, response) {
     if (phone === undefined || phone.length < 10) {
         response.json({
             success: false,
-            message: "Create user failed : Phone Number minimum 10 digits",
+            message: "Register failed : Phone Number minimum 10 digits",
             result: null
         })
         return
@@ -101,7 +101,7 @@ export async function register(request, response) {
     if (address === undefined || address.length < 10) {
         response.json({
             success: false,
-            message: "Create user failed : Address minimum 10 characters",
+            message: "Register failed : Address minimum 10 characters",
             result: null
         })
         return
@@ -110,7 +110,7 @@ export async function register(request, response) {
     if (email === undefined || !email.includes("@")) {
         response.json({
             success: false,
-            message: "Create user failed : Invalid email",
+            message: "Register failed : Invalid email",
             result: null
         })
         return
@@ -119,7 +119,7 @@ export async function register(request, response) {
     if (password === undefined || password.length < 8) {
         response.json({
             success: false,
-            message: "Create user failed : Password too weak! minimum 8 characters",
+            message: "Register failed : Password too weak! minimum 8 characters",
             result: null
         })
         return
@@ -128,11 +128,12 @@ export async function register(request, response) {
     if (confirm_password !== password) {
         response.json({
             success: false,
-            message: "Create user failed : Confirm password not match",
+            message: "Register failed : Confirm password not match",
             result: null
         })
         return
     }
+
     try {
         const user = await userCredentialsModel.getUserCredentialsByEmail(email);
 
@@ -143,24 +144,22 @@ export async function register(request, response) {
                 results: null
             });
         }
-    } catch { }
 
-    try {
         const hashedPassword = await GenerateHash(password)
         const registeredUser = await userModel.createUsersWithProfileAndCredentials({ first_name, last_name, address }, { email, phone, password: hashedPassword })
         if (!registeredUser) {
-            throw new Error("Create user transaction fail!");
+            throw new Error("Register transaction fail!");
         }
 
         response.json({
             success: true,
-            message: "Create user success !",
+            message: "Register success !",
             result: registeredUser
         })
     } catch (error) {
         response.json({
             success: true,
-            message: "Create users fail !" + error,
+            message: "Registers fail !" + error,
             result: null
         })
     }
