@@ -4,7 +4,7 @@ import * as userProfileController from "../controllers/user_profiles.controller.
 
 const userProfileRouter = Router()
 
-// userProfileRouter.use(AuthMiddleware)
+userProfileRouter.use(AuthMiddleware)
 
 userProfileRouter.get("", userProfileController.getUserProfileById)
 
