@@ -11,7 +11,7 @@ export async function login(request, response) {
     const { email, password } = request.body
     if (email !== "" && email.includes("@")) {
         try {
-            const [user, index] = await userModel.getUserByEmail(email)
+            const user = await userModel.getUserCredentialsByEmail(email)
             if (!user) {
                 response.json(
                     {
