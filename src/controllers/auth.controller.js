@@ -1,5 +1,5 @@
 import * as userModel from "../models/users.model.js"
-import {generateToken} from "../lib/jwt.js"
+import { generateToken } from "../lib/jwt.js"
 import { GenerateHash, VerifyHash } from "../lib/hash.js"
 
 /**
@@ -11,19 +11,8 @@ export async function login(request, response) {
     const { email, password } = request.body
     if (email !== "" && email.includes("@")) {
         try {
-            const user = await userModel.getUserCredentialsByEmail(email)
-            if (!user) {
-                response.json(
-                    {
-                        success: false,
-                        messages: "Login fail! wrong email or password",
-                        result: null
-                    }
-                )
-                return
-            }
-            
-            if (!(await VerifyHash(user.password, password))) {
+            const userCredentials = await userModel.getUserCredentialsByEmail(email)
+            if (!userCredentials) {
                 response.json(
                     {
                         success: false,
@@ -34,7 +23,17 @@ export async function login(request, response) {
                 return
             }
 
-            const token = generateToken({id: user.id})
+            if (!(await VerifyHash(userCredentials.password, password))) {
+                response.json(
+                    {
+                        success: false,
+                        messages: "Login fail! wrong email or password",
+                        result: null
+                    }
+                )
+                return
+            }
+            const token = generateToken({ id: userCredentials.user_id })
 
             response.json(
                 {
@@ -100,8 +99,8 @@ export async function register(request, response) {
     }
     const hashedPassword = await GenerateHash(password)
 
-    const newUser = await userModel.createUsers({email, password: hashedPassword})
-    const token = await generateToken({user_id: newUser.id})
+    const newUser = await userModel.createUsers({ email, password: hashedPassword })
+    const token = await generateToken({ user_id: newUser.id })
     response.json({
         success: true,
         message: "Register success!",
