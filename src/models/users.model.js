@@ -107,6 +107,7 @@ export async function createUsersWithProfileAndCredentials(userProfile, userCred
             updated_at: user.rows[0].updated_at,
         }
         await client.query(`COMMIT`)
+        console.log(registeredUser)
         return registeredUser
     } catch (error) {
         await client.query(`ROLLBACK`)

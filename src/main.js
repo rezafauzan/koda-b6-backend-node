@@ -4,6 +4,7 @@ import docsRouter from "./routes/docs.router.js"
 import authRouter from "./routes/auth.router.js"
 import userRouter from "./routes/users.router.js"
 import userProfileRouter from "./routes/user_profiles.router.js"
+import userCredentialsRouter from "./routes/user_credentials.router.js"
 
 const app = express()
 const port = 8888
@@ -32,6 +33,7 @@ app.use("/docs", docsRouter)
 app.use("/auth", authRouter)
 app.use("/admin/users", userRouter)
 app.use("/profile", userProfileRouter)
+app.use("/credentials", userCredentialsRouter)
 
 app.listen(port, function(){
     console.log(`App listening on port ${port}`)
