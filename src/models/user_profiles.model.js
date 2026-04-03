@@ -15,15 +15,14 @@ import db from "../lib/db.js";
  * @param {number} id 
  * @returns {UserProfile}
  */
-export async function getUserProfileById(id) {
+export async function getUserProfileById(user_id) {
     const sql = `SELECT id, user_id, user_avatar, first_name, last_name, address, created_at, updated_at FROM user_profiles WHERE user_id = $1`
-    const values = [id]
+    const values = [user_id]
     const result = await db().query(sql, values)
-    if (result.rows.length > 0) {
-        return result.rows[0]
-    } else {
+    if (result.rows.length < 1) {
         throw new Error("User profile not found !");
     }
+    return result.rows[0]
 }
 
 /**
@@ -35,11 +34,8 @@ export async function updateUserProfile(newUserProfileData) {
     const sql = `UPDATE user_profiles SET user_avatar = $1, first_name = $2, last_name = $3, address = $4, updated_at = $5 WHERE user_id = $6 RETURNING id, user_id, user_avatar, first_name, last_name, address, created_at, updated_at`
     const values = [ newUserProfileData.user_avatar, newUserProfileData.first_name, newUserProfileData.last_name, newUserProfileData.address, newUserProfileData.updated_at, newUserProfileData.user_id]
     const result = await db().query(sql, values)
-    console.log(result)
-
-    if (result.rows.length > 0) {
-        return await result.rows[0]
-    } else {
+    if (result.rows.length < 1) {
         throw new Error("Users not found !");
-    }
+    }   
+    return await result.rows[0]
 }
