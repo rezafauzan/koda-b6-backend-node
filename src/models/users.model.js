@@ -2,9 +2,32 @@ import db from "../lib/db.js"
 
 /**
  * @typedef {Object} User
- * @property {number} id
- * @property {number} role_id
+ * @property {number}  id
+ * @property {number}  role_id
  * @property {boolean} verified
+ * @property {string}  created_at
+ * @property {string}  updated_at
+ */
+
+/**
+ * @typedef {Object} UserProfile
+ * @property {number} id
+ * @property {number} user_id
+ * @property {string} user_avatar
+ * @property {string} first_name
+ * @property {string} last_name
+ * @property {string} address
+ * @property {string} created_at
+ * @property {string} updated_at
+ */
+
+/**
+ * @typedef {Object} UserCredentials
+ * @property {number} id
+ * @property {number} user_id
+ * @property {string} email
+ * @property {string} phone
+ * @property {string} password
  * @property {string} created_at
  * @property {string} updated_at
  */
@@ -23,11 +46,11 @@ export async function getAllUsers() {
  * @returns {User}
  */
 export async function getUserById(id) {
+    const sql = `SELECT id, role_id, verified, created_at, updated_at FROM users WHERE id = $1`
+    const result = await db().query(sql, [id])
 
-    const foundIndex = usersData.findIndex(user => user.id === parseInt(id))
-
-    if (foundIndex !== -1) {
-        return [usersData[foundIndex], foundIndex]
+    if (result.rows.length > 0) {
+        return await result.rows[0]
     } else {
         throw new Error("Users not found !");
     }
@@ -37,14 +60,15 @@ export async function getUserById(id) {
  * 
  * @param {string} email 
  * @returns {User}
- */
-export async function getUserByEmail(email) {
-    const foundIndex = usersData.findIndex(user => user.email === email)
-
-    if (foundIndex !== -1) {
-        return [usersData[foundIndex], foundIndex]
+*/
+export async function getUserCredentialsByEmail(email) {
+    const sql = `SELECT user_id, email, phone, password, created_at, updated_at FROM user_credentials WHERE email = $1`
+    const result = await db().query(sql, [email])
+    
+    if (result.rows.length > 0) {
+        return result.rows[0]
     } else {
-        return [null, null]
+        throw new Error("Users not found !");
     }
 }
 
