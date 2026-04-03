@@ -59,7 +59,7 @@ export async function getUserById(id) {
 /**
  * 
  * @param {string} email 
- * @returns {User}
+ * @returns {UserCredentials}
 */
 export async function getUserCredentialsByEmail(email) {
     const sql = `SELECT user_id, email, phone, password, created_at, updated_at FROM user_credentials WHERE email = $1`
