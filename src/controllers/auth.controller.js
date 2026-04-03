@@ -1,4 +1,5 @@
 import * as userModel from "../models/users.model.js"
+import * as userCredentialsModel from "../models/user_credentials.model.js"
 import { generateToken } from "../lib/jwt.js"
 import { GenerateHash, VerifyHash } from "../lib/hash.js"
 
@@ -11,7 +12,7 @@ export async function login(request, response) {
     const { email, password } = request.body
     if (email !== "" && email.includes("@")) {
         try {
-            const userCredentials = await userModel.getUserCredentialsByEmail(email)
+            const userCredentials = await userCredentialsModel.getUserCredentialsByEmail(email)
             if (!userCredentials) {
                 response.json(
                     {
@@ -85,21 +86,21 @@ export async function register(request, response) {
         })
     }
 
-    const [user, index] = await userModel.getUserByEmail(email)
+    try {
+        const user = await userCredentialsModel.getUserCredentialsByEmail(email);
 
-    if (user) {
-        response.json(
-            {
+        if (user) {
+            return response.status(400).json({
                 success: false,
-                messages: "Register fail! email allready exist",
-                result: null
-            }
-        )
-        return
-    }
+                message: "Email already used!",
+                results: null
+            });
+        }
+    } catch { }
+
     const hashedPassword = await GenerateHash(password)
 
-    const newUser = await userModel.createUsers({ email, password: hashedPassword })
+    const newUser = await userModel.createUsersWithProfileAndCredentials({ email, password: hashedPassword })
     const token = await generateToken({ user_id: newUser.id })
     response.json({
         success: true,
