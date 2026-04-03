@@ -19,10 +19,7 @@ export async function getUserCredentialsByUserId(userId) {
     const sql = `SELECT id, user_id, email, phone, password, created_at, updated_at FROM user_credentials WHERE user_id = $1`
     const values = [userId]
     const result = await db().query(sql, values)
-    if (result.rows.length < 1) {
-        throw new Error("User credentials not found!")
-    }
-    return result.rows[0]
+    return result.rows[0] ?? null
 }
 
 /**
@@ -34,12 +31,8 @@ export async function getUserCredentialsByEmail(email) {
     const sql = `SELECT user_id, email, phone, password, created_at, updated_at FROM user_credentials WHERE email = $1`
     const values = [email]
     const result = await db().query(sql, values)
-    if (result.rows.length < 1) {
-        throw new Error("Users not found !");
-    }
-    return result.rows[0]
+    return result.rows[0] ?? null
 }
-
 
 /**
  * @param {Object} newUserCredentialsData
@@ -54,8 +47,5 @@ export async function updateUserCredentials(newUserCredentialsData) {
     const sql = `UPDATE user_credentials SET email = $1, phone = $2, password = $3, updated_at = $4 WHERE user_id = $5 RETURNING id, user_id, email, phone, password, created_at, updated_at`
     const values = [newUserCredentialsData.email, newUserCredentialsData.phone, newUserCredentialsData.password, newUserCredentialsData.updated_at, newUserCredentialsData.user_id]
     const result = await db().query(sql, values)
-    if (result.rows.length < 1) {
-        throw new Error("User credentials not found!")
-    }
-    return result.rows[0]
+    return result.rows[0] ?? null
 }

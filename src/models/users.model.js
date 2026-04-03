@@ -37,8 +37,8 @@ import db from "../lib/db.js"
  */
 export async function getAllUsers() {
     const sql = "SELECT users.id, user_profiles.user_avatar, user_profiles.first_name, user_profiles.last_name, user_credentials.email, user_credentials.phone, user_profiles.address, users.verified, roles.role_name, users.created_at, users.updated_at FROM users JOIN roles ON roles.id = users.role_id JOIN user_profiles ON user_profiles.user_id = users.id JOIN user_credentials ON user_credentials.user_id = users.id"
-    const rows = await (await db().query("SELECT * FROM users")).rows
-    return rows
+    const result = await db().query("SELECT * FROM users")
+    return result.rows[0] ?? null
 }
 
 /**
@@ -48,12 +48,7 @@ export async function getAllUsers() {
 export async function getUserById(id) {
     const sql = `SELECT id, role_id, verified, created_at, updated_at FROM users WHERE id = $1`
     const result = await db().query(sql, [id])
-
-    if (result.rows.length > 0) {
-        return await result.rows[0]
-    } else {
-        throw new Error("Users not found !");
-    }
+    return result.rows[0] ?? null
 }
 
 /**
@@ -67,7 +62,7 @@ export async function createUsers() {
     const verified = true
     const data = [role_id, verified]
     const result = await db().query(sql, data)
-    return result.rows
+    return result.rows[0] ?? null
 }
 
 export async function createUsersWithProfileAndCredentials(userProfile, userCredentials) {
@@ -111,8 +106,9 @@ export async function createUsersWithProfileAndCredentials(userProfile, userCred
         return registeredUser
     } catch (error) {
         await client.query(`ROLLBACK`)
+        throw error
     } finally {
-        await client.release()
+        client.release()
     }
 }
 
@@ -122,22 +118,9 @@ export async function createUsersWithProfileAndCredentials(userProfile, userCred
  * @param {User} data 
  */
 export async function updateUser(id, newData) {
-    const foundIndex = usersData.findIndex(user => user.id === parseInt(id))
 
-    if (foundIndex !== -1) {
-        usersData[foundIndex] = {
-            ...usersData[foundIndex],
-            ...newData
-        }
-
-        return usersData[foundIndex]
-    } else {
-        throw new Error("Users not found !");
-    }
 }
 
 export async function deleteUser(id) {
-    const [user, index] = await getUserById(id)
-    usersData.splice(index, 1)
-    return user
+
 }
