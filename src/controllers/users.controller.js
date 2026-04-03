@@ -23,7 +23,7 @@ export async function getAllUsers(request, response) {
 export async function createUsers(request, response) {
     const { first_name, last_name, address, phone, email, password, confirm_password } = request.body
 
-    if (!first_name || first_name.length < 4) {
+    if (first_name === undefined || first_name.length < 4) {
         response.json({
             success: false,
             message: "Create user failed : First Name minimum 4 characters",
@@ -32,7 +32,7 @@ export async function createUsers(request, response) {
         return
     }
 
-    if (!last_name || last_name.length < 4) {
+    if (last_name === undefined || last_name.length < 4) {
         response.json({
             success: false,
             message: "Create user failed :Last Name minimum 4 characters",
@@ -41,7 +41,7 @@ export async function createUsers(request, response) {
         return
     }
 
-    if (!phone || phone.length < 10) {
+    if (phone === undefined || phone.length < 10) {
         response.json({
             success: false,
             message: "Create user failed : Phone Number minimum 10 digits",
@@ -50,7 +50,7 @@ export async function createUsers(request, response) {
         return
     }
 
-    if (!address || address.length < 10) {
+    if (address === undefined || address.length < 10) {
         response.json({
             success: false,
             message: "Create user failed : Address minimum 10 characters",
@@ -59,7 +59,7 @@ export async function createUsers(request, response) {
         return
     }
 
-    if (!email.includes("@")) {
+    if (email === undefined || !email.includes("@")) {
         response.json({
             success: false,
             message: "Create user failed : Invalid email",
@@ -68,7 +68,7 @@ export async function createUsers(request, response) {
         return
     }
 
-    if (!password || password.length < 8) {
+    if (password === undefined || password.length < 8) {
         response.json({
             success: false,
             message: "Create user failed : Password too weak! minimum 8 characters",
@@ -85,9 +85,20 @@ export async function createUsers(request, response) {
         })
         return
     }
-
-    const hashedPassword = await GenerateHash(password)
     try {
+        const user = await userCredentialsModel.getUserCredentialsByEmail(email);
+
+        if (user) {
+            return response.status(400).json({
+                success: false,
+                message: "Email already used!",
+                results: null
+            });
+        }
+    } catch { }
+
+    try {
+        const hashedPassword = await GenerateHash(password)
         const registeredUser = await userModel.createUsersWithProfileAndCredentials({ first_name, last_name, address }, { email, phone, password: hashedPassword })
         if (!registeredUser) {
             throw new Error("Create user transaction fail!");

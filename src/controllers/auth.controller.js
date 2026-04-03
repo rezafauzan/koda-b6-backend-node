@@ -69,23 +69,70 @@ export async function login(request, response) {
  * @param {import("express").Response} response 
  */
 export async function register(request, response) {
-    const { email, password } = request.body
-    if (email === "" && !email.includes("@")) {
-        response.status(400).json({
+    const { first_name, last_name, address, phone, email, password, confirm_password } = request.body
+
+    if (first_name === undefined || first_name.length < 4) {
+        response.json({
             success: false,
-            messages: "Register fail! email invalid",
+            message: "Create user failed : First Name minimum 4 characters",
             result: null
         })
+        return
     }
 
-    if (password.length < 8) {
-        response.status(400).json({
+    if (last_name === undefined || last_name.length < 4) {
+        response.json({
             success: false,
-            messages: "Register fail! password too weak minimal 8 characters",
+            message: "Create user failed :Last Name minimum 4 characters",
             result: null
         })
+        return
     }
 
+    if (phone === undefined || phone.length < 10) {
+        response.json({
+            success: false,
+            message: "Create user failed : Phone Number minimum 10 digits",
+            result: null
+        })
+        return
+    }
+
+    if (address === undefined || address.length < 10) {
+        response.json({
+            success: false,
+            message: "Create user failed : Address minimum 10 characters",
+            result: null
+        })
+        return
+    }
+
+    if (email === undefined || !email.includes("@")) {
+        response.json({
+            success: false,
+            message: "Create user failed : Invalid email",
+            result: null
+        })
+        return
+    }
+
+    if (password === undefined || password.length < 8) {
+        response.json({
+            success: false,
+            message: "Create user failed : Password too weak! minimum 8 characters",
+            result: null
+        })
+        return
+    }
+
+    if (confirm_password !== password) {
+        response.json({
+            success: false,
+            message: "Create user failed : Confirm password not match",
+            result: null
+        })
+        return
+    }
     try {
         const user = await userCredentialsModel.getUserCredentialsByEmail(email);
 
@@ -98,13 +145,23 @@ export async function register(request, response) {
         }
     } catch { }
 
-    const hashedPassword = await GenerateHash(password)
+    try {
+        const hashedPassword = await GenerateHash(password)
+        const registeredUser = await userModel.createUsersWithProfileAndCredentials({ first_name, last_name, address }, { email, phone, password: hashedPassword })
+        if (!registeredUser) {
+            throw new Error("Create user transaction fail!");
+        }
 
-    const newUser = await userModel.createUsersWithProfileAndCredentials({ email, password: hashedPassword })
-    const token = await generateToken({ user_id: newUser.id })
-    response.json({
-        success: true,
-        message: "Register success!",
-        result: token
-    })
+        response.json({
+            success: true,
+            message: "Create user success !",
+            result: registeredUser
+        })
+    } catch (error) {
+        response.json({
+            success: true,
+            message: "Create users fail !" + error,
+            result: null
+        })
+    }
 }
