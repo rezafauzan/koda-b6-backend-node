@@ -7,5 +7,6 @@ const userProfileRouter = Router()
 userProfileRouter.use(AuthMiddleware)
 
 userProfileRouter.get("", userProfileController.getUserProfileById)
+userProfileRouter.patch("", userProfileController.updateUserProfile)
 
 export default userProfileRouter
