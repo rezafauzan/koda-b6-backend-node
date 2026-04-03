@@ -3,6 +3,7 @@ import {constants} from "node:http2"
 import docsRouter from "./routes/docs.router.js"
 import authRouter from "./routes/auth.router.js"
 import userRouter from "./routes/users.router.js"
+import userProfileRouter from "./routes/user_profiles.router.js"
 
 const app = express()
 const port = 8888
@@ -30,6 +31,7 @@ app.get("/", function(request, respond){
 app.use("/docs", docsRouter)
 app.use("/auth", authRouter)
 app.use("/admin/users", userRouter)
+app.use("/profile", userProfileRouter)
 
 app.listen(port, function(){
     console.log(`App listening on port ${port}`)
