@@ -58,22 +58,6 @@ export async function getUserById(id) {
 
 /**
  * 
- * @param {string} email 
- * @returns {UserCredentials}
-*/
-export async function getUserCredentialsByEmail(email) {
-    const sql = `SELECT user_id, email, phone, password, created_at, updated_at FROM user_credentials WHERE email = $1`
-    const result = await db().query(sql, [email])
-    
-    if (result.rows.length > 0) {
-        return result.rows[0]
-    } else {
-        throw new Error("Users not found !");
-    }
-}
-
-/**
- * 
  * @param {User} data 
  * @returns 
  */
