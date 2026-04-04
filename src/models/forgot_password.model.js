@@ -29,3 +29,24 @@ export async function CreateForgotPassword(email, codeOtp) {
         client.release()
     }
 }
+
+/**
+ * 
+ * @param {string} email 
+ * @returns {ForgotPassword}
+ */
+export async function GetLatestOTP(email) {
+    const client = await db().connect()
+
+    try {
+        const sql = `SELECT id, email, code_otp, created_at, updated_at FROM forgot_password WHERE email = $1 ORDER BY created_at DESC, id DESC LIMIT 1`
+        const data = [email]
+        const result = await client.query(sql, data)
+        return result.rows[0] ?? null
+    } catch (error) {
+        throw error
+    } finally {
+        client.release()
+    }
+}
+
