@@ -89,7 +89,6 @@ export async function createUsersWithProfileAndCredentials(userProfile, userCred
         const sqlCart = `INSERT INTO carts (user_id, created_at, updated_at) VALUES ($1, $2, $3) RETURNING id;`
         const registeredCart = await client.query(sqlCart, [user_id, now, now])
 
-        console.log(user)
         const registeredUser = {
             id: user.rows[0].id,
 
