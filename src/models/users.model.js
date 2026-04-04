@@ -68,6 +68,7 @@ export async function createUsers() {
 export async function createUsersWithProfileAndCredentials(userProfile, userCredentials) {
     const client = await db().connect()
     try {
+        const now = new Date()
         await client.query(`BEGIN`)
         const sqlUser = `INSERT INTO users (role_id, verified) VALUES ($1, $2) RETURNING id, role_id, verified, created_at, updated_at;`
         const role_id = 2
@@ -76,14 +77,19 @@ export async function createUsersWithProfileAndCredentials(userProfile, userCred
         const user = await client.query(sqlUser, data)
         const user_id = user.rows[0].id
 
-        const sqlUserProfile = `INSERT INTO user_profiles (user_avatar, user_id, first_name, last_name, address) VALUES ($1, $2, $3, $4, $5) RETURNING user_id, user_avatar, first_name, last_name, address;`
+        const sqlUserProfile = `INSERT INTO user_profiles (user_avatar, user_id, first_name, last_name, address, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING user_id, user_avatar, first_name, last_name, address;`
         const user_avatar = "https://i.pravatar.cc/400?img=4"
         const { first_name, last_name, address } = userProfile
-        const registeredUserProfile = await client.query(sqlUserProfile, [user_avatar, user_id, first_name, last_name, address])
-        const sqlUserCredentials = `INSERT INTO user_credentials (user_id, email, phone, password) VALUES ($1, $2, $3, $4) RETURNING user_id, email, phone, created_at, updated_at;`
-        const { email, phone, password } = userCredentials
-        const registeredUserCredentials = await client.query(sqlUserCredentials, [user_id, email, phone, password])
+        const registeredUserProfile = await client.query(sqlUserProfile, [user_avatar, user_id, first_name, last_name, address, now, now])
 
+        const sqlUserCredentials = `INSERT INTO user_credentials (user_id, email, phone, password, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING user_id, email, phone, created_at, updated_at;`
+        const { email, phone, password } = userCredentials
+        const registeredUserCredentials = await client.query(sqlUserCredentials, [user_id, email, phone, password, now, now])
+
+        const sqlCart = `INSERT INTO carts (user_id, created_at, updated_at) VALUES ($1, $2, $3) RETURNING id;`
+        const registeredCart = await client.query(sqlCart, [user_id, now, now])
+
+        console.log(user)
         const registeredUser = {
             id: user.rows[0].id,
 
@@ -97,12 +103,11 @@ export async function createUsersWithProfileAndCredentials(userProfile, userCred
 
             verified: user.rows[0].verified,
             role_id: user.rows[0].role_id,
-
+            cart_id: registeredCart.rows[0].id,
             created_at: user.rows[0].created_at,
             updated_at: user.rows[0].updated_at,
         }
         await client.query(`COMMIT`)
-        console.log(registeredUser)
         return registeredUser
     } catch (error) {
         await client.query(`ROLLBACK`)
