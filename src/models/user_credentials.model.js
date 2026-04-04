@@ -49,3 +49,25 @@ export async function updateUserCredentials(newUserCredentialsData) {
     const result = await db().query(sql, values)
     return result.rows[0] ?? null
 }
+
+/**
+ * 
+ * @param {string} email
+ * @param {string} newPassword
+ * @returns {UserCredentials}
+ */
+export async function updatePasswordByEmail(email, newPassword) {
+    const client = await db().connect()
+
+    try {
+        const now = new Date()
+        const sql = `UPDATE user_credentials SET password = $1, updated_at = $2 WHERE email = $3 RETURNING id, user_id, email, phone, password, created_at, updated_at`
+        const data = [newPassword, now, email]
+        const result = await client.query(sql, data)
+        return result.rows[0] ?? null
+    } catch (error) {
+        throw error
+    } finally {
+        client.release()
+    }
+}
