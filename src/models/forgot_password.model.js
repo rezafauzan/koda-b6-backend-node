@@ -50,3 +50,22 @@ export async function GetLatestOTP(email) {
     }
 }
 
+/**
+ * 
+ * @param {string} email 
+ * @returns {ForgotPassword}
+ */
+export async function deleteOTPByEmail(email) {
+    const client = await db().connect()
+
+    try {
+        const sql = `DELETE FROM forgot_password WHERE email = $1 RETURNING id, email, code_otp, created_at, updated_at`
+        const data = [email]
+        const result = await client.query(sql, data)
+        return result.rows[0] ?? null
+    } catch (error) {
+        throw error
+    } finally {
+        client.release()
+    }
+}
