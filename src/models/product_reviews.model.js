@@ -1,3 +1,5 @@
+import db from "../lib/db.js"
+
 /**
  * @typedef {Object} ProductReview
  * @property {number} id
@@ -9,3 +11,12 @@
  * @property {string} updated_at
  */
 
+
+/**
+ * @return {ProductReview[]}
+ */
+export async function getAllProductsReviews() {
+    const sql = `SELECT id, product_id, user_id, rating, messages, created_at, updated_at FROM product_reviews`
+    const result = await db().query(sql)
+    return result.rows[0] ?? null
+}
