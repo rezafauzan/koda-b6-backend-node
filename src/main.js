@@ -6,6 +6,7 @@ import userRouter from "./routes/users.router.js"
 import userProfileRouter from "./routes/user_profiles.router.js"
 import userCredentialsRouter from "./routes/user_credentials.router.js"
 import forgotPasswordRouter from "./routes/forgot_password.router.js"
+import productReviewsRouter from "./routes/product_reviews.router.js"
 
 const app = express()
 const port = 8888
@@ -36,6 +37,7 @@ app.use("/admin/users", userRouter)
 app.use("/profile", userProfileRouter)
 app.use("/credentials", userCredentialsRouter)
 app.use("/forgot-password", forgotPasswordRouter)
+app.use("/reviews", productReviewsRouter)
 
 app.listen(port, function(){
     console.log(`App listening on port ${port}`)
