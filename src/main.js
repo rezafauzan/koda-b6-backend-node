@@ -7,8 +7,10 @@ import userProfileRouter from "./routes/user_profiles.router.js"
 import userCredentialsRouter from "./routes/user_credentials.router.js"
 import forgotPasswordRouter from "./routes/forgot_password.router.js"
 import productReviewsRouter from "./routes/product_reviews.router.js"
+import { corsMiddleware } from "./middleware/cors.middleware.js"
 
 const app = express()
+app.use(corsMiddleware)
 const port = process.env.PORT || 8888
 
 app.use(express.json())
