@@ -29,5 +29,5 @@ export async function getPopularProducts() {
     const limit = 4
     const values = [limit]
     const result = await db().query(sql, values)
-    return result.rows[0] ?? null
+    return result.rows ?? null
 }
