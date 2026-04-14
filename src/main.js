@@ -9,7 +9,7 @@ import forgotPasswordRouter from "./routes/forgot_password.router.js"
 import productReviewsRouter from "./routes/product_reviews.router.js"
 
 const app = express()
-const port = 8888
+const port = process.env.PORT || 8888
 
 app.use(express.json())
 /**
