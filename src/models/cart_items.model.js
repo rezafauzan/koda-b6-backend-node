@@ -25,6 +25,18 @@ export async function createCartItem({ cart_id, product_id, size_id, variant_id,
 
 /**
  * 
+ * @param {number} cart_id
+ * @returns {CartItem[]}
+ */
+export async function getAllCartItemsByCartId({ cart_id }) {
+    const sql = `SELECT id, cart_id, product_id, size_id, variant_id, quantity, created_at, updated_at FROM cart_items WHERE cart_id = $1;`
+    const values = [cart_id]
+    const result = await db().query(sql, values)
+    return result.rows ?? []
+}
+
+/**
+ * 
  * @param {number} id
  * @returns {CartItem}
  */
