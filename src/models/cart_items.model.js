@@ -23,3 +23,14 @@ export async function createCartItem({ cart_id, product_id, size_id, variant_id,
     return result.rows[0] ?? null
 }
 
+/**
+ * 
+ * @param {number} id
+ * @returns {CartItem}
+ */
+export async function deleteCartItem({ id }) {
+    const sql = `DELETE FROM cart_items WHERE id = $1 RETURNING id, cart_id, product_id, size_id, variant_id, quantity, created_at, updated_at;`
+    const values = [id]
+    const result = await db().query(sql, values)
+    return result.rows[0] ?? null
+}
