@@ -19,6 +19,20 @@ export async function getAllProductsReviews(request, response) {
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
+export async function getLatestReviews(request, response) {
+    const productsReviews = await productReviewsModel.getLatestReviews()
+    response.json({
+        success: true,
+        message: "Get latest products reviews data",
+        result: productsReviews
+    })
+}
+
+/**
+ * 
+ * @param {import("express").Request} request 
+ * @param {import("express").Response} response 
+ */
 export async function getPopularProducts(request, response) {
     const popularProducts = await productReviewsModel.getPopularProducts()
     response.json({
