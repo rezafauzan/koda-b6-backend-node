@@ -67,6 +67,74 @@ const productReviewsRouter = Router()
  *                   nullable: true
  *                   example: null
  */
-productReviewsRouter.get("", productReviewsController.getPopularProducts)
+productReviewsRouter.get("/recommended-products", productReviewsController.getPopularProducts)
+
+/**
+ * @openapi
+ * /reviews:
+ *   get:
+ *     tags:
+ *       - product-reviews
+ *     summary: Get latest product reviews
+ *     description: Retrieve latest product reviews from database
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved latest product reviews
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Get latest products reviews data"
+ *                 result:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       product_id:
+ *                         type: integer
+ *                         example: 2
+ *                       user_id:
+ *                         type: integer
+ *                         example: 5
+ *                       rating:
+ *                         type: integer
+ *                         example: 4
+ *                       messages:
+ *                         type: string
+ *                         example: "Great coffee!"
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2026-04-14T10:00:00.000Z"
+ *                       updated_at:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2026-04-14T10:00:00.000Z"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                 result:
+ *                   nullable: true
+ *                   example: null
+ */
+productReviewsRouter.get("/reviews", productReviewsController.getLatestReviews)
 
 export default productReviewsRouter

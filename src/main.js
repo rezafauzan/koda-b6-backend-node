@@ -39,7 +39,7 @@ app.use("/admin/users", userRouter)
 app.use("/profile", userProfileRouter)
 app.use("/credentials", userCredentialsRouter)
 app.use("/forgot-password", forgotPasswordRouter)
-app.use("/reviews", productReviewsRouter)
+app.use("", productReviewsRouter)
 
 app.listen(port, function(){
     console.log(`App listening on port ${port}`)
