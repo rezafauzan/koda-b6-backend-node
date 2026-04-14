@@ -5,15 +5,15 @@ const productReviewsRouter = Router()
 
 /**
  * @openapi
- * /product-reviews:
+ * /reviews/:
  *   get:
  *     tags:
  *       - product-reviews
- *     summary: Get all product reviews
- *     description: Retrieve all product reviews from database
+ *     summary: Get popular products based on reviews
+ *     description: Retrieve top popular products based on number of reviews
  *     responses:
  *       200:
- *         description: Successfully retrieved product reviews
+ *         description: Successfully retrieved popular products
  *         content:
  *           application/json:
  *             schema:
@@ -24,11 +24,33 @@ const productReviewsRouter = Router()
  *                   example: true
  *                 message:
  *                   type: string
- *                   example: "Get all products reviews data"
+ *                   example: "Get popular products"
  *                 result:
  *                   type: array
  *                   items:
  *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       category_id:
+ *                         type: integer
+ *                         example: 2
+ *                       name:
+ *                         type: string
+ *                         example: "Coffee Latte"
+ *                       description:
+ *                         type: string
+ *                         example: "Delicious latte coffee"
+ *                       price:
+ *                         type: integer
+ *                         example: 25000
+ *                       stock:
+ *                         type: integer
+ *                         example: 10
+ *                       total_reviews:
+ *                         type: integer
+ *                         example: 15
  *       500:
  *         description: Server error
  *         content:
@@ -42,8 +64,9 @@ const productReviewsRouter = Router()
  *                 message:
  *                   type: string
  *                 result:
- *                   type: null
+ *                   nullable: true
+ *                   example: null
  */
-productReviewsRouter.get("", productReviewsController.getAllProductsReviews)
+productReviewsRouter.get("", productReviewsController.getPopularProducts)
 
 export default productReviewsRouter
