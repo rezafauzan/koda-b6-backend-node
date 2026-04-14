@@ -1,9 +1,5 @@
 export const corsMiddleware = (request, response, next) => {
-    const allowedOrigins = [
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "https://your-domain.com",
-    ]
+    const allowedOrigins = process.env.FRONTEND_URL
 
     const origin = request.headers.origin
 
