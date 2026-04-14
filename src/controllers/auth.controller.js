@@ -34,15 +34,27 @@ export async function login(request, response) {
                 )
                 return
             }
-            const token = generateToken({ id: userCredentials.user_id })
 
-            response.json(
-                {
-                    success: true,
-                    messages: "Login success!",
-                    result: token
-                }
-            )
+            const userData = await userModel.getUserCartAndRoleByUserId(userCredentials.user_id)
+            
+            if (!userData || !userData.cart_id || !userData.role_name) {
+                throw new Error("Data user tidak valid silahkan hubungi administrator")
+            }
+
+            const payload = {
+                id: userCredentials.user_id,
+                cart_id: userData.cart_id,
+                role_name: userData.role_name
+            }
+
+            const token = generateToken(payload)
+
+            response.json({
+                success: true,
+                message: "Login success!",
+                result: token
+            })
+
         } catch (error) {
             response.json(
                 {
