@@ -33,25 +33,6 @@ import db from "../lib/db.js"
  */
 
 /**
- * @return {User[]}
- */
-export async function getAllUsers() {
-    const sql = "SELECT users.id, user_profiles.user_avatar, user_profiles.first_name, user_profiles.last_name, user_credentials.email, user_credentials.phone, user_profiles.address, users.verified, roles.role_name, users.created_at, users.updated_at FROM users JOIN roles ON roles.id = users.role_id JOIN user_profiles ON user_profiles.user_id = users.id JOIN user_credentials ON user_credentials.user_id = users.id"
-    const result = await db().query("SELECT * FROM users")
-    return result.rows[0] ?? null
-}
-
-/**
- * @param {number} id 
- * @returns {User}
- */
-export async function getUserById(id) {
-    const sql = `SELECT id, role_id, verified, created_at, updated_at FROM users WHERE id = $1`
-    const result = await db().query(sql, [id])
-    return result.rows[0] ?? null
-}
-
-/**
  * 
  * @param {User} data 
  * @returns 
@@ -65,6 +46,12 @@ export async function createUsers() {
     return result.rows[0] ?? null
 }
 
+/**
+ * 
+ * @param {UserProfile} userProfile 
+ * @param {UserCredentials} userCredentials 
+ * @returns {User}
+ */
 export async function createUsersWithProfileAndCredentials(userProfile, userCredentials) {
     const client = await db().connect()
     try {
@@ -114,6 +101,25 @@ export async function createUsersWithProfileAndCredentials(userProfile, userCred
     } finally {
         client.release()
     }
+}
+
+/**
+ * @return {User[]}
+ */
+export async function getAllUsers() {
+    const sql = "SELECT users.id, user_profiles.user_avatar, user_profiles.first_name, user_profiles.last_name, user_credentials.email, user_credentials.phone, user_profiles.address, users.verified, roles.role_name, users.created_at, users.updated_at FROM users JOIN roles ON roles.id = users.role_id JOIN user_profiles ON user_profiles.user_id = users.id JOIN user_credentials ON user_credentials.user_id = users.id"
+    const result = await db().query("SELECT * FROM users")
+    return result.rows[0] ?? null
+}
+
+/**
+ * @param {number} id 
+ * @returns {User}
+ */
+export async function getUserById(id) {
+    const sql = `SELECT id, role_id, verified, created_at, updated_at FROM users WHERE id = $1`
+    const result = await db().query(sql, [id])
+    return result.rows[0] ?? null
 }
 
 /**
