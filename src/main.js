@@ -8,6 +8,7 @@ import userCredentialsRouter from "./routes/user_credentials.router.js"
 import forgotPasswordRouter from "./routes/forgot_password.router.js"
 import productReviewsRouter from "./routes/product_reviews.router.js"
 import { corsMiddleware } from "./middleware/cors.middleware.js"
+import { authMiddleware } from "./middleware/auth.middleware.js"
 import cartItemsRouter from "./routes/cart_items.router.js"
 
 const app = express()
@@ -37,11 +38,11 @@ app.get("/", function(request, respond){
 app.use("/docs", docsRouter)
 app.use("/auth", authRouter)
 app.use("/admin/users", userRouter)
-app.use("/profile", userProfileRouter)
-app.use("/credentials", userCredentialsRouter)
+app.use("/profile", authMiddleware, userProfileRouter)
+app.use("/credentials", authMiddleware, userCredentialsRouter)
 app.use("/forgot-password", forgotPasswordRouter)
 app.use("", productReviewsRouter)
-app.use("/cart", cartItemsRouter)
+app.use("/cart", authMiddleware, cartItemsRouter)
 
 app.listen(port, function(){
     console.log(`App listening on port ${port}`)
