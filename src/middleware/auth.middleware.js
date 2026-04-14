@@ -14,7 +14,7 @@ export default function Auth(request, response, next) {
         const token = authHeader.slice(prefix.length)
         const payload = verifyToken(token)
         if (payload) {
-            response.locals = payload
+            response.locals.userData = payload
             next()
             return
         }
