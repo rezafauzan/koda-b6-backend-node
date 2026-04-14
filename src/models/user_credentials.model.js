@@ -35,6 +35,17 @@ export async function getUserCredentialsByEmail(email) {
 }
 
 /**
+ * @param {number} user_id
+ * @returns {{ user_id: number, cart_id: number, role_name: string } | null}
+ */
+export async function getUserCartAndRoleByUserId(user_id) {
+    const sql = `SELECT users.id AS user_id, carts.id AS cart_id, roles.role_name FROM users JOIN carts ON carts.user_id = users.id JOIN roles ON roles.id = users.role_id WHERE users.id = $1`
+    const values = [user_id]
+    const result = await db().query(sql, values)
+    return result.rows[0] ?? null
+}
+
+/**
  * @param {Object} newUserCredentialsData
  * @param {number} newUserCredentialsData.user_id
  * @param {string} newUserCredentialsData.email
