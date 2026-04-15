@@ -12,6 +12,7 @@ import authMiddleware from "./middleware/auth.middleware.js"
 import cartItemsRouter from "./routes/cart_items.router.js"
 import productRouter from "./routes/products.router.js"
 import rolesRouter from "./routes/role.router.js"
+import rbac from "./middleware/rbac.middleware.js"
 
 const app = express()
 app.use(corsMiddleware)
@@ -39,8 +40,8 @@ app.get("/", function(request, respond){
 
 app.use("/docs", docsRouter)
 app.use("/auth", authRouter)
-app.use("/role", rolesRouter)
-app.use("/admin/users", userRouter)
+app.use("/role", rbac("admin"), authMiddleware, rolesRouter)
+app.use("/admin/users", rbac("admin"), authMiddleware, userRouter)
 app.use("/profile", authMiddleware, userProfileRouter)
 app.use("/credentials", authMiddleware, userCredentialsRouter)
 app.use("/forgot-password", forgotPasswordRouter)
