@@ -109,7 +109,7 @@ export async function updateUserAvatar(request, response) {
         )
     }
 
-    const user_avatar = `/assets/img/user/avatar/${file.filename}`
+    const user_avatar = `${process.env.BASE_URL}/assets/img/user/avatar/${file.filename}`
 
     const newUserProfileData = {
         user_id: userCurrentProfile.id,
