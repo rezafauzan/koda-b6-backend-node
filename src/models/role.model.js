@@ -37,8 +37,8 @@ export async function getAllRoles() {
  * @returns {Role}
  */
 export async function getRoleByName({ role_name }) {
-    const sql = `SELECT id, role_name, created_at, updated_at FROM roles WHERE role_name = $1 LIMIT 1;`
-    const values = [role_name]
+    const sql = `SELECT id, role_name, created_at, updated_at FROM roles WHERE role_name ILIKE $1;`
+    const values = [`%${role_name}%`]
     const result = await db().query(sql, values)
     return result.rows[0] ?? null
 }
