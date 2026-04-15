@@ -6,21 +6,31 @@ import fs from "fs"
 const storage = (folder) =>
     multer.diskStorage({
         destination: function (req, file, cb) {
-            fs.mkdirSync(folder, { recursive: true })
-            cb(null, folder)
+            const uploadPath = path.join(process.cwd(), folder)
+
+            fs.mkdirSync(uploadPath, { recursive: true })
+
+            console.log("UPLOAD PATH:", uploadPath)
+
+            cb(null, uploadPath)
         },
+
         filename: function (req, file, cb) {
-            const randStr = nanoid()
+            const filename = nanoid()
             const ext = path.extname(file.originalname)
-            cb(null, `${randStr}${ext}`)
+
+            cb(null, `${filename}${ext}`)
         },
     })
 
 const fileFilter = (req, file, cb) => {
-    const allowed = ["image/png", "image/jpg"]
+    const allowed = ["image/png", "image/jpg", "image/jpeg", "image/webp"]
 
     if (!allowed.includes(file.mimetype)) {
-        return cb(new Error("Only image files are allowed"), false)
+        return cb(
+            new Error("Only png, jpg, jpeg, webp files are allowed"),
+            false
+        )
     }
 
     cb(null, true)
