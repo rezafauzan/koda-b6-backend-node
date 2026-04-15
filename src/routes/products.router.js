@@ -1,5 +1,7 @@
 import { Router } from "express"
 import * as productController from "../controllers/products.controller.js"
+import authMiddleware from "../middleware/auth.middleware.js"
+import rbac from "../middleware/rbac.middleware.js"
 
 const productRouter = Router()
 
@@ -85,7 +87,7 @@ productRouter.get("/category/:category_id", productController.getProductsByCateg
  *       200:
  *         description: Product created successfully
  */
-productRouter.post("", productController.createProduct)
+productRouter.post("", rbac("admin"), authMiddleware, productController.createProduct)
 
 /**
  * @openapi
@@ -123,7 +125,7 @@ productRouter.post("", productController.createProduct)
  *       200:
  *         description: Product updated successfully
  */
-productRouter.put("/:id", productController.updateProduct)
+productRouter.put("/:id", rbac("admin"), authMiddleware, productController.updateProduct)
 
 /**
  * @openapi
@@ -144,6 +146,6 @@ productRouter.put("/:id", productController.updateProduct)
  *       200:
  *         description: Product deleted successfully
  */
-productRouter.delete("/:id", productController.deleteProduct)
+productRouter.delete("/:id", rbac("admin"), authMiddleware, productController.deleteProduct)
 
 export default productRouter
