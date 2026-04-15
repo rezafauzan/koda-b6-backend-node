@@ -1,199 +1,174 @@
 import * as productModel from "../models/products.model.js"
+import { httpResponse } from "../lib/http_handlers.js"
 
 export async function createProduct(request, response) {
+    const { category_id, name, description, price, stock } = request.body
+
+    if (!category_id) {
+        return httpResponse.badRequest(response, "category_id is required")
+    }
+
+    if (!name) {
+        return httpResponse.badRequest(response, "name is required")
+    }
+
+    if (name.length < 4) {
+        return httpResponse.badRequest(response, "name must be at least 4 characters")
+    }
+
+    if (!description) {
+        return httpResponse.badRequest(response, "description is required")
+    }
+
+    if (price === undefined || price === null) {
+        return httpResponse.badRequest(response, "price is required")
+    }
+
+    if (Number(price) <= 0) {
+        return httpResponse.badRequest(response, "price must be greater than 0")
+    }
+
+    if (stock === undefined || stock === null) {
+        return httpResponse.badRequest(response, "stock is required")
+    }
+
+    if (Number(stock) <= 0) {
+        return httpResponse.badRequest(response, "stock must be greater than 0")
+    }
+
     try {
-        const { category_id, name, description, price, stock } = request.body
-
-        if (!category_id) {
-            return response.json({
-                success: false,
-                message: "category_id is required",
-                result: null
-            })
-        }
-
-        if (!name) {
-            return response.json({
-                success: false,
-                message: "name is required",
-                result: null
-            })
-        }
-
-        if (name.length < 4) {
-            return response.json({
-                success: false,
-                message: "name must be at least 4 characters",
-                result: null
-            })
-        }
-
-        if (!description) {
-            return response.json({
-                success: false,
-                message: "description is required",
-                result: null
-            })
-        }
-
-        if (!price && price !== 0) {
-            return response.json({
-                success: false,
-                message: "price is required",
-                result: null
-            })
-        }
-
-        if (Number(price) <= 0) {
-            return response.json({
-                success: false,
-                message: "price must be greater than 0",
-                result: null
-            })
-        }
-
-        if (!stock && stock !== 0) {
-            return response.json({
-                success: false,
-                message: "stock is required",
-                result: null
-            })
-        }
-
-        if (Number(stock) <= 0) {
-            return response.json({
-                success: false,
-                message: "stock must be greater than 0",
-                result: null
-            })
-        }
-
         const result = await productModel.createProduct({
             category_id: Number(category_id),
             name,
             description,
-            price: parseFloat(price),
+            price: Number(price),
             stock: Number(stock)
         })
 
-        return response.json({
-            success: true,
-            message: "Create product success",
+        return httpResponse.created(
+            response,
+            "Create product success",
             result
-        })
-    } catch (error) {
-        console.error(error)
+        )
 
-        return response.json({
-            success: false,
-            message: "Internal server error",
-            result: null
-        })
+    } catch (error) {
+        return httpResponse.serverError(
+            response,
+            "Create product failed: " + error.message
+        )
     }
 }
 
 export async function getProducts(request, response) {
+    const { name } = request.query
+
     try {
-        const { name } = request.query
+        const result = name
+            ? await productModel.getProductsByName({ name })
+            : await productModel.getAllProducts()
 
-        let result
-
-        if (name) {
-            result = await productModel.getProductsByName({ name })
-        } else {
-            result = await productModel.getAllProducts()
-        }
-
-        return response.json({
-            success: true,
-            message: "Get products success",
+        return httpResponse.ok(
+            response,
+            "Get products success",
             result
-        })
-    } catch (error) {
-        console.error(error)
+        )
 
-        return response.json({
-            success: false,
-            message: "Internal server error",
-            result: null
-        })
+    } catch (error) {
+        return httpResponse.serverError(
+            response,
+            "Get products failed: " + error.message
+        )
     }
 }
 
 export async function getProductsByCategoryId(request, response) {
-    try {
-        const { category_id } = request.params
+    const { category_id } = request.params
 
+    if (!category_id) {
+        return httpResponse.badRequest(response, "category_id is required")
+    }
+
+    try {
         const result = await productModel.getProductsByCategoryId({
             category_id: Number(category_id)
         })
 
-        return response.json({
-            success: true,
-            message: "Get products by category success",
+        return httpResponse.ok(
+            response,
+            "Get products by category success",
             result
-        })
-    } catch (error) {
-        console.error(error)
+        )
 
-        return response.json({
-            success: false,
-            message: "Internal server error",
-            result: null
-        })
+    } catch (error) {
+        return httpResponse.serverError(
+            response,
+            "Get products by category failed: " + error.message
+        )
     }
 }
 
 export async function updateProduct(request, response) {
-    try {
-        const { id } = request.params
-        const { category_id, name, description, price, stock } = request.body
+    const { id } = request.params
+    const { category_id, name, description, price, stock } = request.body
 
+    if (!id) {
+        return httpResponse.badRequest(response, "id is required")
+    }
+
+    try {
         const result = await productModel.updateProduct({
             id: Number(id),
-            category_id: Number(category_id),
+            category_id: category_id ? Number(category_id) : undefined,
             name,
             description,
-            price: parseFloat(price),
-            stock: Number(stock)
+            price: price !== undefined ? Number(price) : undefined,
+            stock: stock !== undefined ? Number(stock) : undefined
         })
 
-        return response.json({
-            success: true,
-            message: "Update product success",
+        if (!result) {
+            return httpResponse.notFound(response, "Product not found")
+        }
+
+        return httpResponse.ok(
+            response,
+            "Update product success",
             result
-        })
-    } catch (error) {
-        console.error(error)
+        )
 
-        return response.json({
-            success: false,
-            message: "Internal server error",
-            result: null
-        })
+    } catch (error) {
+        return httpResponse.serverError(
+            response,
+            "Update product failed: " + error.message
+        )
     }
 }
 
 export async function deleteProduct(request, response) {
-    try {
-        const { id } = request.params
+    const { id } = request.params
 
+    if (!id) {
+        return httpResponse.badRequest(response, "id is required")
+    }
+
+    try {
         const result = await productModel.deleteProduct({
             id: Number(id)
         })
 
-        return response.json({
-            success: true,
-            message: "Delete product success",
-            result
-        })
-    } catch (error) {
-        console.error(error)
+        if (!result) {
+            return httpResponse.notFound(response, "Product not found")
+        }
 
-        return response.json({
-            success: false,
-            message: "Internal server error",
-            result: null
-        })
+        return httpResponse.ok(
+            response,
+            "Delete product success",
+            result
+        )
+
+    } catch (error) {
+        return httpResponse.serverError(
+            response,
+            "Delete product failed: " + error.message
+        )
     }
 }
