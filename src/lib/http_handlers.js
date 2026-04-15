@@ -44,6 +44,12 @@ export const httpResponse = {
         )
     },
 
+    conflict: (res, message = "Conflict") => {
+        return res.status(409).json(
+            buildResponse(false, message, null)
+        )
+    },
+
     serverError: (res, message = "Internal Server Error") => {
         return res.status(500).json(
             buildResponse(false, message, null)
