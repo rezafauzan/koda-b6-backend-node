@@ -8,5 +8,6 @@ userProfileRouter.use(AuthMiddleware)
 
 userProfileRouter.get("", userProfileController.getUserProfileById)
 userProfileRouter.patch("", userProfileController.updateUserProfile)
+userProfileRouter.patch("/avatar", uploadMiddleware("/assets/img/user/avatar/").single("file"), userProfileController.updateUserAvatar)
 
 export default userProfileRouter
