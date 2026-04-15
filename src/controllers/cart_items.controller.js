@@ -6,8 +6,8 @@ import * as cartItemModel from "../models/cart_items.model.js"
  * @param {import("express").Response} response 
  */
 export async function createCartItem(request, response) {
-    const { cart_id, product_id, size_id, variant_id, quantity } = request.body
-
+    const { product_id, size_id, variant_id, quantity } = request.body
+    const { cart_id } = response.locals.userData
     if (cart_id === undefined) {
         response.json({
             success: false,
@@ -80,8 +80,8 @@ export async function createCartItem(request, response) {
  * @param {import("express").Response} response 
  */
 export async function getAllCartItemsByCartId(request, response) {
-    const { cart_id } = request.params
-
+    const { cart_id } = response.locals.userData
+    
     if (cart_id === undefined) {
         response.json({
             success: false,
@@ -90,10 +90,10 @@ export async function getAllCartItemsByCartId(request, response) {
         })
         return
     }
-
+    
     try {
         const cartItems = await cartItemModel.getAllCartItemsByCartId({ cart_id })
-
+        
         response.json({
             success: true,
             message: "Get all cart items success",
@@ -112,9 +112,10 @@ export async function getAllCartItemsByCartId(request, response) {
  * 
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
- */
+*/
 export async function deleteCartItem(request, response) {
     const { id } = request.params
+    const { cart_id } = response.locals.userData
 
     if (id === undefined) {
         response.json({
@@ -126,7 +127,7 @@ export async function deleteCartItem(request, response) {
     }
 
     try {
-        const deletedCartItem = await cartItemModel.deleteCartItem({ id })
+        const deletedCartItem = await cartItemModel.deleteCartItem({ id, cart_id })
 
         if (!deletedCartItem) {
             response.json({

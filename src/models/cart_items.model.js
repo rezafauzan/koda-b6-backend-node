@@ -40,9 +40,9 @@ export async function getAllCartItemsByCartId({ cart_id }) {
  * @param {number} id
  * @returns {CartItem}
  */
-export async function deleteCartItem({ id }) {
-    const sql = `DELETE FROM cart_items WHERE id = $1 RETURNING id, cart_id, product_id, size_id, variant_id, quantity, created_at, updated_at;`
-    const values = [id]
+export async function deleteCartItem({ id, cart_id }) {
+    const sql = `DELETE FROM cart_items WHERE id = $1 AND cart_id = $2 RETURNING id, cart_id, product_id, size_id, variant_id, quantity, created_at, updated_at;`
+    const values = [id, cart_id]
     const result = await db().query(sql, values)
     return result.rows[0] ?? null
 }
