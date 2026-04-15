@@ -1,43 +1,68 @@
 import * as productReviewsModel from "../models/product_reviews.model.js"
+import { httpResponse } from "../lib/http_handlers.js"
 
 /**
- * 
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
 export async function getAllProductsReviews(request, response) {
-    const productsReviews = await productReviewsModel.getAllProductsReviews()
-    response.json({
-        success: true,
-        message: "Get all products reviews data",
-        result: productsReviews
-    })
+    try {
+        const productsReviews = await productReviewsModel.getAllProductsReviews()
+
+        return httpResponse.ok(
+            response,
+            "Get all products reviews data",
+            productsReviews
+        )
+
+    } catch (error) {
+        return httpResponse.serverError(
+            response,
+            "Failed to get all product reviews: " + error.message
+        )
+    }
 }
 
 /**
- * 
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
 export async function getLatestReviews(request, response) {
-    const productsReviews = await productReviewsModel.getLatestReviews()
-    response.json({
-        success: true,
-        message: "Get latest products reviews data",
-        result: productsReviews
-    })
+    try {
+        const productsReviews = await productReviewsModel.getLatestReviews()
+
+        return httpResponse.ok(
+            response,
+            "Get latest products reviews data",
+            productsReviews
+        )
+
+    } catch (error) {
+        return httpResponse.serverError(
+            response,
+            "Failed to get latest reviews: " + error.message
+        )
+    }
 }
 
 /**
- * 
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
 export async function getPopularProducts(request, response) {
-    const popularProducts = await productReviewsModel.getPopularProducts()
-    response.json({
-        success: true,
-        message: "Get popular products",
-        result: popularProducts
-    })
+    try {
+        const popularProducts = await productReviewsModel.getPopularProducts()
+
+        return httpResponse.ok(
+            response,
+            "Get popular products",
+            popularProducts
+        )
+
+    } catch (error) {
+        return httpResponse.serverError(
+            response,
+            "Failed to get popular products: " + error.message
+        )
+    }
 }
