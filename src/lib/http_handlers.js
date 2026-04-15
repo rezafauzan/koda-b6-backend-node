@@ -1,57 +1,52 @@
+const buildResponse = (success, message, result, links = null) => {
+    return {
+        success,
+        message,
+        result,
+        links
+    }
+}
+
 export const httpResponse = {
-    ok: (response, message = "OK", result = null) => {
-        return response.status(200).json({
-            success: true,
-            message,
-            result
-        })
+    ok: (res, message = "OK", result = null, links = null) => {
+        return res.status(200).json(
+            buildResponse(true, message, result, links)
+        )
     },
 
-    created: (response, message = "Created", result = null) => {
-        return response.status(201).json({
-            success: true,
-            message,
-            result
-        })
+    created: (res, message = "Created", result = null, links = null) => {
+        return res.status(201).json(
+            buildResponse(true, message, result, links)
+        )
     },
 
-    badRequest: (response, message = "Bad Request", result = null) => {
-        return response.status(400).json({
-            success: false,
-            message,
-            result
-        })
+    badRequest: (res, message = "Bad Request") => {
+        return res.status(400).json(
+            buildResponse(false, message, null)
+        )
     },
 
-    unauthorized: (response, message = "Unauthorized") => {
-        return response.status(401).json({
-            success: false,
-            message,
-            result: null
-        })
+    unauthorized: (res, message = "Unauthorized") => {
+        return res.status(401).json(
+            buildResponse(false, message, null)
+        )
     },
 
-    forbidden: (response, message = "Forbidden") => {
-        return response.status(403).json({
-            success: false,
-            message,
-            result: null
-        })
+    forbidden: (res, message = "Forbidden") => {
+        return res.status(403).json(
+            buildResponse(false, message, null)
+        )
     },
 
-    notFound: (response, message = "Not Found") => {
-        return response.status(404).json({
-            success: false,
-            message,
-            result: null
-        })
+    notFound: (res, message = "Not Found") => {
+        return res.status(404).json(
+            buildResponse(false, message, null)
+        )
     },
 
-    serverError: (response, message = "Internal Server Error") => {
-        return response.status(500).json({
-            success: false,
-            message,
-            result: null
-        })
+    serverError: (res, message = "Internal Server Error") => {
+        return res.status(500).json(
+            buildResponse(false, message, null)
+        )
     }
 }
