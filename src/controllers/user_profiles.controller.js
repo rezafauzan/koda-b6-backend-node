@@ -89,3 +89,49 @@ export async function updateUserProfile(request, response) {
         )
     }
 }
+
+/**
+ * 
+ * @param {import("express").Request} request 
+ * @param {import("express").Response} response 
+ */
+export async function updateUserAvatar(request, response) {
+    const user = response.locals.userData
+
+    const userCurrentProfile = await userProfilesModel.getUserProfileById(user.id)
+
+    const file = request.file
+
+    if (!file) {
+        return httpResponse.badRequest(
+            response,
+            "User avatar file is required"
+        )
+    }
+
+    const user_avatar = `/assets/img/user/avatar/${file.filename}`
+
+    const newUserProfileData = {
+        user_id: userCurrentProfile.id,
+        user_avatar: user_avatar ?? userCurrentProfile.user_avatar,
+        first_name: userCurrentProfile.first_name,
+        last_name: userCurrentProfile.last_name,
+        address: userCurrentProfile.address,
+        updated_at: new Date()
+    }
+
+    try {
+        const userProfile = await userProfilesModel.updateUserProfile(newUserProfileData)
+
+        return httpResponse.ok(
+            response,
+            "Success update user avatar!",
+            userProfile
+        )
+    } catch (error) {
+        return httpResponse.serverError(
+            response,
+            "Failed update user avatar! " + error
+        )
+    }
+}
