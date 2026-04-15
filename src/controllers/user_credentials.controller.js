@@ -1,50 +1,52 @@
 import { GenerateHash } from "../lib/hash.js"
 import { verifyToken } from "../lib/jwt.js"
 import * as userCredentialsModel from "../models/user_credentials.model.js"
+import { httpResponse } from "../lib/http_handlers.js"
+
+function getUserFromToken(request) {
+    const authHeader = request.headers.authorization
+    const prefix = "Bearer "
+
+    if (!authHeader || !authHeader.startsWith(prefix)) {
+        return null
+    }
+
+    const token = authHeader.slice(prefix.length)
+    return verifyToken(token)
+}
 
 /**
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
 export async function getUserCredentialsById(request, response) {
-    const authHeader = request.headers.authorization
-    const prefix = "Bearer "
-    const isBearer = authHeader?.startsWith(prefix)
-
-    if (!isBearer) {
-        return response.status(401).json({
-            success: false,
-            message: "Authorization token missing!",
-            result: null
-        })
-    }
-
-    const token = authHeader.slice(prefix.length)
-    const payload = verifyToken(token)
+    const payload = getUserFromToken(request)
 
     if (!payload) {
-        return response.json({
-            success: false,
-            message: "Failed get user credentials! token invalid",
-            result: null
-        })
+        return httpResponse.unauthorized(response, "Authorization token missing or invalid")
     }
 
     try {
-        const { password, ...userCredentials } =
+        const data =
             await userCredentialsModel.getUserCredentialsByUserId(payload.id)
 
-        return response.json({
-            success: true,
-            message: "Success get user credentials!",
-            result: userCredentials
-        })
+        if (!data) {
+            return httpResponse.notFound(response, "User not found")
+        }
+
+        const { password, ...safeData } = data
+
+        return httpResponse.ok(
+            response,
+            "Success get user credentials",
+            safeData
+        )
+
     } catch (error) {
-        return response.json({
-            success: false,
-            message: "Failed get user credentials! " + error,
-            result: null
-        })
+        return httpResponse.serverError(
+            response,
+            "Failed get user credentials: " + error.message
+        )
     }
 }
 
@@ -53,101 +55,86 @@ export async function getUserCredentialsById(request, response) {
  * @param {import("express").Response} response 
  */
 export async function updateUserCredentials(request, response) {
-    const authHeader = request.headers.authorization
-    const prefix = "Bearer "
-    const isBearer = authHeader?.startsWith(prefix)
-
-    if (!isBearer) {
-        return response.status(401).json({
-            success: false,
-            message: "Authorization token missing!",
-            result: null
-        })
-    }
-
-    const token = authHeader.slice(prefix.length)
-
-    const payload = verifyToken(token)
+    const payload = getUserFromToken(request)
 
     if (!payload) {
-        return response.json({
-            success: false,
-            message: "Failed update user credentials! token invalid",
-            result: null
-        })
+        return httpResponse.unauthorized(response, "Authorization token missing or invalid")
     }
-
-    const userCurrentCredentials = await userCredentialsModel.getUserCredentialsByUserId(payload.id)
 
     const { email, phone, password, confirm_password } = request.body
 
-    if (email !== undefined && !email.includes("@")) {
-        return response.status(400).json({
-            success: false,
-            message: "Email invalid",
-            results: null
-        })
-    }
     try {
-        const user = await userCredentialsModel.getUserCredentialsByEmail(email);
+        const currentUser =
+            await userCredentialsModel.getUserCredentialsByUserId(payload.id)
 
-        if (user) {
-            return response.status(400).json({
-                success: false,
-                message: "Email already used!",
-                results: null
-            });
+        if (!currentUser) {
+            return httpResponse.notFound(response, "User not found")
         }
-    } catch {}
 
+        // EMAIL VALIDATION
+        if (email !== undefined) {
+            if (!email.includes("@")) {
+                return httpResponse.badRequest(response, "Email invalid")
+            }
 
-    if (phone !== undefined && phone.length < 10) {
-        return response.status(400).json({
-            success: false,
-            message: "Phone must be at least 10 digits long",
-            results: null
-        })
-    }
+            const existingEmail =
+                await userCredentialsModel.getUserCredentialsByEmail(email)
 
-    if (password !== undefined && password.length < 8) {
-        return response.status(400).json({
-            success: false,
-            message: "Password too weak must be at least 8 characters long",
-            results: null
-        })
-    }
+            if (existingEmail && existingEmail.user_id !== payload.id) {
+                return httpResponse.badRequest(response, "Email already used")
+            }
+        }
 
-    if (confirm_password !== undefined && confirm_password.length < 8) {
-        return response.status(400).json({
-            success: false,
-            message: "Confirm password doesn't match",
-            results: null
-        })
-    }
+        // PHONE VALIDATION
+        if (phone !== undefined && phone.length < 10) {
+            return httpResponse.badRequest(
+                response,
+                "Phone must be at least 10 digits"
+            )
+        }
 
-    const hashedPassword = password ? await GenerateHash(password) : userCurrentCredentials.password
+        // PASSWORD VALIDATION
+        let hashedPassword = currentUser.password
 
-    const newUserCredentialsData = {
-        user_id: userCurrentCredentials.user_id,
-        email: email ?? userCurrentCredentials.email,
-        phone: phone ?? userCurrentCredentials.phone,
-        password: hashedPassword ?? userCurrentCredentials.password,
-        updated_at: new Date()
-    }
+        if (password !== undefined) {
+            if (password.length < 8) {
+                return httpResponse.badRequest(
+                    response,
+                    "Password must be at least 8 characters"
+                )
+            }
 
-    try {
-        const userCredentials = await userCredentialsModel.updateUserCredentials(newUserCredentialsData)
+            if (password !== confirm_password) {
+                return httpResponse.badRequest(
+                    response,
+                    "Password confirmation mismatch"
+                )
+            }
 
-        return response.json({
-            success: true,
-            message: "Success update user credentials!",
-            result: userCredentials
-        })
+            hashedPassword = await GenerateHash(password)
+        }
+
+        const newUserCredentialsData = {
+            user_id: currentUser.user_id,
+            email: email ?? currentUser.email,
+            phone: phone ?? currentUser.phone,
+            password: hashedPassword,
+            updated_at: new Date()
+        }
+
+        const updated =
+            await userCredentialsModel.updateUserCredentials(newUserCredentialsData)
+
+        return httpResponse.ok(
+            response,
+            "Success update user credentials",
+            updated
+        )
+
     } catch (error) {
-        return response.json({
-            success: false,
-            message: "Failed update user credentials! " + error,
-            result: null
-        })
+        return httpResponse.serverError(
+            response,
+            "Failed update user credentials: " + error.message
+        )
     }
 }
