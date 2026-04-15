@@ -8,7 +8,7 @@ import userCredentialsRouter from "./routes/user_credentials.router.js"
 import forgotPasswordRouter from "./routes/forgot_password.router.js"
 import productReviewsRouter from "./routes/product_reviews.router.js"
 import { corsMiddleware } from "./middleware/cors.middleware.js"
-import { authMiddleware } from "./middleware/auth.middleware.js"
+import authMiddleware from "./middleware/auth.middleware.js"
 import cartItemsRouter from "./routes/cart_items.router.js"
 
 const app = express()

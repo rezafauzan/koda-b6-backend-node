@@ -6,7 +6,7 @@ import { verifyToken } from "../lib/jwt.js"
  * @param {import("express").Response} response 
  * @param {import("express").NextFunction} next 
  */
-export default function Auth(request, response, next) {
+export default function authMiddleware(request, response, next) {
     const authHeader = request.headers.authorization
     const prefix = "Bearer "
     const isBearer = authHeader?.startsWith(prefix)
