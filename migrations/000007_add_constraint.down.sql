@@ -1,0 +1,98 @@
+
+ALTER TABLE users 
+ALTER COLUMN role_id DROP NOT NULL,
+ALTER COLUMN verified DROP NOT NULL;
+
+ALTER TABLE user_profiles 
+ALTER COLUMN user_id DROP NOT NULL,
+ALTER COLUMN user_avatar DROP NOT NULL,
+ALTER COLUMN first_name DROP NOT NULL,
+ALTER COLUMN last_name DROP NOT NULL,
+ALTER COLUMN address DROP NOT NULL;
+
+ALTER TABLE user_credentials 
+ALTER COLUMN user_id DROP NOT NULL,
+ALTER COLUMN email DROP NOT NULL,
+ALTER COLUMN phone DROP NOT NULL,
+ALTER COLUMN password DROP NOT NULL;
+
+ALTER TABLE user_credentials 
+DROP CONSTRAINT IF EXISTS uq_user_credentials_email;
+
+ALTER TABLE user_credentials 
+DROP CONSTRAINT IF EXISTS uq_user_credentials_phone;
+
+ALTER TABLE roles 
+ALTER COLUMN role_name DROP NOT NULL;
+
+ALTER TABLE roles 
+DROP CONSTRAINT IF EXISTS uq_roles_role_name;
+
+ALTER TABLE products 
+ALTER COLUMN category_id DROP NOT NULL,
+ALTER COLUMN name DROP NOT NULL,
+ALTER COLUMN description DROP NOT NULL,
+ALTER COLUMN price DROP NOT NULL,
+ALTER COLUMN stock DROP NOT NULL;
+
+ALTER TABLE product_categories 
+ALTER COLUMN name DROP NOT NULL;
+
+ALTER TABLE product_categories 
+DROP CONSTRAINT IF EXISTS uq_product_categories_name;
+
+ALTER TABLE product_images 
+ALTER COLUMN product_id DROP NOT NULL,
+ALTER COLUMN image DROP NOT NULL;
+
+ALTER TABLE product_reviews 
+ALTER COLUMN product_id DROP NOT NULL,
+ALTER COLUMN user_id DROP NOT NULL,
+ALTER COLUMN rating DROP NOT NULL;
+
+ALTER TABLE product_variants 
+ALTER COLUMN product_id DROP NOT NULL,
+ALTER COLUMN variant_name DROP NOT NULL,
+ALTER COLUMN additional_price DROP NOT NULL;
+
+ALTER TABLE product_variants 
+DROP CONSTRAINT IF EXISTS uq_product_variants_product_variant;
+
+ALTER TABLE product_portions 
+ALTER COLUMN product_id DROP NOT NULL,
+ALTER COLUMN portion_size DROP NOT NULL,
+ALTER COLUMN additional_price DROP NOT NULL;
+
+ALTER TABLE product_portions 
+DROP CONSTRAINT IF EXISTS uq_product_portions_product_portion;
+
+ALTER TABLE product_discounts 
+ALTER COLUMN discount_rate DROP NOT NULL;
+
+ALTER TABLE product_campaigns 
+ALTER COLUMN name DROP NOT NULL,
+ALTER COLUMN description DROP NOT NULL,
+ALTER COLUMN discount_id DROP NOT NULL;
+
+ALTER TABLE product_campaigns 
+DROP CONSTRAINT IF EXISTS uq_product_campaigns_name;
+
+ALTER TABLE carts 
+ALTER COLUMN user_id DROP NOT NULL;
+
+ALTER TABLE cart_items 
+ALTER COLUMN cart_id DROP NOT NULL,
+ALTER COLUMN product_id DROP NOT NULL,
+ALTER COLUMN size_id DROP NOT NULL,
+ALTER COLUMN variant_id DROP NOT NULL,
+ALTER COLUMN quantity DROP NOT NULL;
+
+ALTER TABLE orders 
+ALTER COLUMN cart_id DROP NOT NULL,
+ALTER COLUMN total DROP NOT NULL,
+ALTER COLUMN status DROP NOT NULL,
+ALTER COLUMN fullname DROP NOT NULL,
+ALTER COLUMN phone DROP NOT NULL,
+ALTER COLUMN email DROP NOT NULL,
+ALTER COLUMN address DROP NOT NULL,
+ALTER COLUMN delivery DROP NOT NULL;
