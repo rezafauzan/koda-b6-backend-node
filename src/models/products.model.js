@@ -13,6 +13,24 @@ import redisClient from "../lib/redis.js"
  * @property {string} updated_at
  */
 
+/**
+ * 
+ * @param {number} category_id
+ * @param {string} name
+ * @param {string} description
+ * @param {number} price
+ * @param {number} stock
+ * @returns {Product[]}
+ */
+export async function createProduct({ category_id, name, description, price, stock }) {
+    const sql = `INSERT INTO products (category_id, name, description, price, stock) VALUES ($1, $2, $3, $4, $5) RETURNING id, category_id, name, description, price, stock, created_at, updated_at;`
+    const values = [category_id, name, description, price, stock]
+    const result = await db().query(sql, values)
+
+    await redisClient.del("products")
+
+    return result.rows ?? []
+}
 
 /**
  * 
