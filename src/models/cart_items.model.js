@@ -1,3 +1,5 @@
+import db from "../lib/db.js"
+
 /**
  * @typedef {Object} CartItem
  * @property {number} id
@@ -9,6 +11,7 @@
  * @property {string} created_at
  * @property {string} updated_at
  */
+
 
 /**
  * 
