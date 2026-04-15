@@ -1,153 +1,125 @@
 import * as cartItemModel from "../models/cart_items.model.js"
+import { httpResponse } from "../lib/http_handlers.js"
 
 /**
- * 
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
 export async function createCartItem(request, response) {
     const { product_id, size_id, variant_id, quantity } = request.body
-    const { cart_id } = response.locals.userData
-    if (cart_id === undefined) {
-        response.json({
-            success: false,
-            message: "Invalid sessions please relogin!",
-            result: null
-        })
-        return
+    const { cart_id } = response.locals.userData || {}
+
+    if (!cart_id) {
+        return httpResponse.unauthorized(response, "Invalid session, please relogin!")
     }
 
-    if (product_id === undefined) {
-        response.json({
-            success: false,
-            message: "Add to cart failed product invalid",
-            result: null
-        })
-        return
+    if (!product_id) {
+        return httpResponse.badRequest(response, "Product is required")
     }
 
-    if (size_id === undefined) {
-        response.json({
-            success: false,
-            message: "Add to cart failed product portion invalid",
-            result: null
-        })
-        return
+    if (!size_id) {
+        return httpResponse.badRequest(response, "Size is required")
     }
 
-    if (variant_id === undefined) {
-        response.json({
-            success: false,
-            message: "Add to cart failed product variant invalid",
-            result: null
-        })
-        return
+    if (!variant_id) {
+        return httpResponse.badRequest(response, "Variant is required")
     }
 
-    if (quantity === undefined || quantity < 1) {
-        response.json({
-            success: false,
-            message: "Add to cart failed quantity minimum 1",
-            result: null
-        })
-        return
+    if (!quantity || quantity < 1) {
+        return httpResponse.badRequest(response, "Quantity minimum is 1")
     }
 
     try {
-        const createdCartItem = await cartItemModel.createCartItem({ cart_id, product_id, size_id, variant_id, quantity })
+        const createdCartItem = await cartItemModel.createCartItem({
+            cart_id,
+            product_id,
+            size_id,
+            variant_id,
+            quantity
+        })
 
         if (!createdCartItem) {
-            throw new Error("Add to cart fail!")
+            return httpResponse.serverError(response, "Add to cart failed")
         }
 
-        response.json({
-            success: true,
-            message: "Add to cart success !",
-            result: createdCartItem
-        })
+        return httpResponse.created(
+            response,
+            "Add to cart success",
+            createdCartItem
+        )
+
     } catch (error) {
-        response.json({
-            success: false,
-            message: error,
-            result: null
-        })
+        return httpResponse.serverError(
+            response,
+            "Add to cart failed: " + error.message
+        )
     }
 }
 
 /**
- * 
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
 export async function getAllCartItemsByCartId(request, response) {
-    const { cart_id } = response.locals.userData
-    
-    if (cart_id === undefined) {
-        response.json({
-            success: false,
-            message: "Invalid sessions please relogin!",
-            result: null
-        })
-        return
+    const { cart_id } = response.locals.userData || {}
+
+    if (!cart_id) {
+        return httpResponse.unauthorized(response, "Invalid session, please relogin!")
     }
-    
+
     try {
         const cartItems = await cartItemModel.getAllCartItemsByCartId({ cart_id })
-        
-        response.json({
-            success: true,
-            message: "Get all cart items success",
-            result: cartItems
-        })
+
+        return httpResponse.ok(
+            response,
+            "Get all cart items success",
+            cartItems
+        )
+
     } catch (error) {
-        response.json({
-            success: false,
-            message: "Get cart items fail ! " + error,
-            result: null
-        })
+        return httpResponse.serverError(
+            response,
+            "Get cart items failed: " + error.message
+        )
     }
 }
 
 /**
- * 
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
-*/
+ */
 export async function deleteCartItem(request, response) {
     const { id } = request.params
-    const { cart_id } = response.locals.userData
+    const { cart_id } = response.locals.userData || {}
 
-    if (id === undefined) {
-        response.json({
-            success: false,
-            message: "Delete cart item failed invalid cart_items",
-            result: null
-        })
-        return
+    if (!cart_id) {
+        return httpResponse.unauthorized(response, "Invalid session, please relogin!")
+    }
+
+    if (!id) {
+        return httpResponse.badRequest(response, "Cart item id is required")
     }
 
     try {
-        const deletedCartItem = await cartItemModel.deleteCartItem({ id, cart_id })
+        const deletedCartItem = await cartItemModel.deleteCartItem({
+            id,
+            cart_id
+        })
 
         if (!deletedCartItem) {
-            response.json({
-                success: false,
-                message: "Delete cart item failed : item not found",
-                result: null
-            })
-            return
+            return httpResponse.notFound(response, "Cart item not found")
         }
 
-        response.json({
-            success: true,
-            message: "Delete cart item success !",
-            result: deletedCartItem
-        })
+        return httpResponse.ok(
+            response,
+            "Delete cart item success",
+            deletedCartItem
+        )
+
     } catch (error) {
-        response.json({
-            success: false,
-            message: "Delete cart item fail ! " + error,
-            result: null
-        })
+        return httpResponse.serverError(
+            response,
+            "Delete cart item failed: " + error.message
+        )
     }
 }
