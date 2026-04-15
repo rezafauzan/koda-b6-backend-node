@@ -2,177 +2,151 @@ import * as userModel from "../models/users.model.js"
 import * as userCredentialsModel from "../models/user_credentials.model.js"
 import { generateToken } from "../lib/jwt.js"
 import { GenerateHash, VerifyHash } from "../lib/hash.js"
+import { httpResponse } from "../lib/http_handlers.js"
 
 /**
- * 
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
 export async function login(request, response) {
     const { email, password } = request.body
-    if (email !== "" && email.includes("@")) {
-        try {
-            const userCredentials = await userCredentialsModel.getUserCredentialsByEmail(email)
-            if (!userCredentials) {
-                response.json(
-                    {
-                        success: false,
-                        messages: "Login fail! wrong email or password",
-                        result: null
-                    }
-                )
-                return
-            }
 
-            if (!(await VerifyHash(userCredentials.password, password))) {
-                response.json(
-                    {
-                        success: false,
-                        messages: "Login fail! wrong email or password",
-                        result: null
-                    }
-                )
-                return
-            }
+    if (!email || !email.includes("@")) {
+        return httpResponse.badRequest(response, "Login failed: email invalid")
+    }
 
-            const userData = await userCredentialsModel.getUserCartAndRoleByUserId(userCredentials.user_id)
-            
-            if (!userData || !userData.cart_id || !userData.role_name) {
-                throw new Error("Data user tidak valid silahkan hubungi administrator")
-            }
+    if (!password) {
+        return httpResponse.badRequest(response, "Login failed: password required")
+    }
 
-            const payload = {
-                id: userCredentials.user_id,
-                cart_id: userData.cart_id,
-                role_name: userData.role_name
-            }
+    try {
+        const userCredentials = await userCredentialsModel.getUserCredentialsByEmail(email)
 
-            const token = generateToken(payload)
-
-            response.json({
-                success: true,
-                message: "Login success!",
-                result: token
-            })
-
-        } catch (error) {
-            response.json(
-                {
-                    success: false,
-                    messages: "Login failed! " + error,
-                    result: null
-                }
+        if (!userCredentials) {
+            return httpResponse.unauthorized(
+                response,
+                "Login failed! wrong email or password"
             )
         }
-    } else {
-        response.json(
+
+        const isValidPassword = await VerifyHash(userCredentials.password, password)
+
+        if (!isValidPassword) {
+            return httpResponse.unauthorized(
+                response,
+                "Login failed! wrong email or password"
+            )
+        }
+
+        const userData = await userCredentialsModel.getUserCartAndRoleByUserId(
+            userCredentials.user_id
+        )
+
+        if (!userData || !userData.cart_id || !userData.role_name) {
+            return httpResponse.serverError(
+                response,
+                "Data user tidak valid, hubungi administrator"
+            )
+        }
+
+        const payload = {
+            id: userCredentials.user_id,
+            cart_id: userData.cart_id,
+            role_name: userData.role_name
+        }
+
+        const token = generateToken(payload)
+
+        return httpResponse.ok(
+            response,
+            "Login success!",
+            { token },
             {
-                success: false,
-                messages: "Login failed! email invalid",
-                result: null
+                self: "/auth/login",
+                profile: "/users/me"
             }
+        )
+
+    } catch (error) {
+        return httpResponse.serverError(
+            response,
+            "Login failed: " + error.message
         )
     }
 }
 
 /**
- * 
  * @param {import("express").Request} request 
  * @param {import("express").Response} response 
  */
 export async function register(request, response) {
     const { first_name, last_name, address, phone, email, password, confirm_password } = request.body
 
-    if (first_name === undefined || first_name.length < 4) {
-        response.json({
-            success: false,
-            message: "Register failed : First Name minimum 4 characters",
-            result: null
-        })
-        return
+    if (!first_name || first_name.length < 4) {
+        return httpResponse.badRequest(response, "First Name minimum 4 characters")
     }
 
-    if (last_name === undefined || last_name.length < 4) {
-        response.json({
-            success: false,
-            message: "Register failed :Last Name minimum 4 characters",
-            result: null
-        })
-        return
+    if (!last_name || last_name.length < 4) {
+        return httpResponse.badRequest(response, "Last Name minimum 4 characters")
     }
 
-    if (phone === undefined || phone.length < 10) {
-        response.json({
-            success: false,
-            message: "Register failed : Phone Number minimum 10 digits",
-            result: null
-        })
-        return
+    if (!phone || phone.length < 10) {
+        return httpResponse.badRequest(response, "Phone Number minimum 10 digits")
     }
 
-    if (address === undefined || address.length < 10) {
-        response.json({
-            success: false,
-            message: "Register failed : Address minimum 10 characters",
-            result: null
-        })
-        return
+    if (!address || address.length < 10) {
+        return httpResponse.badRequest(response, "Address minimum 10 characters")
     }
 
-    if (email === undefined || !email.includes("@")) {
-        response.json({
-            success: false,
-            message: "Register failed : Invalid email",
-            result: null
-        })
-        return
+    if (!email || !email.includes("@")) {
+        return httpResponse.badRequest(response, "Invalid email")
     }
 
-    if (password === undefined || password.length < 8) {
-        response.json({
-            success: false,
-            message: "Register failed : Password too weak! minimum 8 characters",
-            result: null
-        })
-        return
+    if (!password || password.length < 8) {
+        return httpResponse.badRequest(response, "Password minimum 8 characters")
     }
 
     if (confirm_password !== password) {
-        response.json({
-            success: false,
-            message: "Register failed : Confirm password not match",
-            result: null
-        })
-        return
+        return httpResponse.badRequest(response, "Confirm password not match")
     }
 
     try {
-        const user = await userCredentialsModel.getUserCredentialsByEmail(email);
+        const existingUser = await userCredentialsModel.getUserCredentialsByEmail(email)
 
-        if (user) {
-            return response.status(400).json({
-                success: false,
-                message: "Email already used!",
-                results: null
-            });
+        if (existingUser) {
+            return httpResponse.conflict
+                ? 
+                httpResponse.conflict(response, "Email already used!")
+                : 
+                httpResponse.badRequest(response, "Email already used!")
         }
 
         const hashedPassword = await GenerateHash(password)
-        const registeredUser = await userModel.createUsersWithProfileAndCredentials({ first_name, last_name, address }, { email, phone, password: hashedPassword })
+
+        const registeredUser =
+            await userModel.createUsersWithProfileAndCredentials(
+                { first_name, last_name, address },
+                { email, phone, password: hashedPassword }
+            )
+
         if (!registeredUser) {
-            throw new Error("Register transaction fail!");
+            return httpResponse.serverError(response, "Register transaction failed!")
         }
 
-        response.json({
-            success: true,
-            message: "Register success !",
-            result: registeredUser
-        })
+        return httpResponse.created(
+            response,
+            "Register success!",
+            registeredUser,
+            {
+                self: "/auth/register",
+                login: "/auth/login"
+            }
+        )
+
     } catch (error) {
-        response.json({
-            success: true,
-            message: "Registers fail !" + error,
-            result: null
-        })
+        return httpResponse.serverError(
+            response,
+            "Register failed: " + error.message
+        )
     }
 }
