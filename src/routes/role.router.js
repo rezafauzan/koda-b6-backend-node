@@ -1,6 +1,7 @@
 import { Router } from "express"
 import * as roleController from "../controllers/role.controller.js"
 import authMiddleware from "../middleware/auth.middleware.js"
+import rbac from "../middleware/rbac.middleware.js"
 
 const rolesRouter = Router()
 
@@ -42,7 +43,7 @@ const rolesRouter = Router()
  *                         type: string
  *                         format: date-time
  */
-rolesRouter.get("", authMiddleware, roleController.getAllRoles)
+rolesRouter.get("", rbac("admin"), authMiddleware, roleController.getAllRoles)
 
 /**
  * @openapi
@@ -90,7 +91,7 @@ rolesRouter.get("", authMiddleware, roleController.getAllRoles)
  *                       type: string
  *                       format: date-time
  */
-rolesRouter.post("", authMiddleware, roleController.createRole)
+rolesRouter.post("", rbac("admin"), authMiddleware, roleController.createRole)
 
 /**
  * @openapi
@@ -123,7 +124,7 @@ rolesRouter.post("", authMiddleware, roleController.createRole)
  *                   type: object
  *                   nullable: true
  */
-rolesRouter.get("/:name", authMiddleware, roleController.getRoleByName)
+rolesRouter.get("/:name", rbac("admin"), authMiddleware, roleController.getRoleByName)
 
 /**
  * @openapi
@@ -166,7 +167,7 @@ rolesRouter.get("/:name", authMiddleware, roleController.getRoleByName)
  *                   type: object
  *                   nullable: true
  */
-rolesRouter.put("/:id", authMiddleware, roleController.updateRole)
+rolesRouter.put("/:id", rbac("admin"), authMiddleware, roleController.updateRole)
 
 /**
  * @openapi
@@ -199,6 +200,6 @@ rolesRouter.put("/:id", authMiddleware, roleController.updateRole)
  *                   type: object
  *                   nullable: true
  */
-rolesRouter.delete("/:id", authMiddleware, roleController.deleteRole)
+rolesRouter.delete("/:id", rbac("admin"), authMiddleware, roleController.deleteRole)
 
 export default rolesRouter
