@@ -47,7 +47,7 @@ export async function getAllProducts() {
     const sql = `SELECT id, category_id, name, description, price, stock, created_at, updated_at FROM products;`
     const values = []
     const result = await db().query(sql, values)
-    const data = result.rows ?? null
+    const data = result.rows ?? []
 
     await redisClient.set(cacheKey, JSON.stringify(data), {
         EX: 900
@@ -65,7 +65,7 @@ export async function getProductsByCategoryId({ category_id }) {
     const sql = `SELECT id, category_id, name, description, price, stock, created_at, updated_at FROM products WHERE category_id = $1;`
     const values = [category_id]
     const result = await db().query(sql, values)
-    return result.rows ?? null
+    return result.rows ?? []
 }
 
 /**
@@ -95,7 +95,7 @@ export async function updateProduct({ id, category_id, name, description, price,
     const values = [category_id, name, description, price, stock, id]
     const result = await db().query(sql, values)
     await redisClient.del("products")
-    return result.rows ?? null
+    return result.rows ?? []
 }
 
 /**
