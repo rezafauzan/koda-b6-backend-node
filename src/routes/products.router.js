@@ -87,7 +87,7 @@ productRouter.get("/category/:category_id", productController.getProductsByCateg
  *       200:
  *         description: Product created successfully
  */
-productRouter.post("", rbac("admin"), authMiddleware, productController.createProduct)
+productRouter.post("", authMiddleware, rbac("admin"), productController.createProduct)
 
 /**
  * @openapi
@@ -125,7 +125,7 @@ productRouter.post("", rbac("admin"), authMiddleware, productController.createPr
  *       200:
  *         description: Product updated successfully
  */
-productRouter.put("/:id", rbac("admin"), authMiddleware, productController.updateProduct)
+productRouter.put("/:id", authMiddleware, rbac("admin"), productController.updateProduct)
 
 /**
  * @openapi
@@ -146,6 +146,6 @@ productRouter.put("/:id", rbac("admin"), authMiddleware, productController.updat
  *       200:
  *         description: Product deleted successfully
  */
-productRouter.delete("/:id", rbac("admin"), authMiddleware, productController.deleteProduct)
+productRouter.delete("/:id", authMiddleware, rbac("admin"), productController.deleteProduct)
 
 export default productRouter
