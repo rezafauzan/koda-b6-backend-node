@@ -13,6 +13,7 @@ import cartItemsRouter from "./routes/cart_items.router.js"
 import productRouter from "./routes/products.router.js"
 import rolesRouter from "./routes/role.router.js"
 import rbac from "./middleware/rbac.middleware.js"
+import paymentRouter from "./routes/orders.router.js"
 
 const app = express()
 app.use(corsMiddleware)
@@ -40,8 +41,8 @@ app.get("/", function(request, respond){
 
 app.use("/docs", docsRouter)
 app.use("/auth", authRouter)
-app.use("/role", rbac("admin"), authMiddleware, rolesRouter)
-app.use("/admin/users", rbac("admin"), authMiddleware, userRouter)
+app.use("/role", authMiddleware, rbac("admin"), rolesRouter)
+app.use("/admin/users", authMiddleware, rbac("admin"), userRouter)
 app.use("/profile", authMiddleware, userProfileRouter)
 app.use("/assets", express.static("assets"))
 app.use("/credentials", authMiddleware, userCredentialsRouter)
@@ -49,6 +50,7 @@ app.use("/forgot-password", forgotPasswordRouter)
 app.use("/products", productRouter)
 app.use("", productReviewsRouter)
 app.use("/cart", authMiddleware, cartItemsRouter)
+app.use("/payment", paymentRouter)
 
 app.listen(port, function(){
     console.log(`App listening on port ${port}`)
