@@ -43,7 +43,7 @@ const rolesRouter = Router()
  *                         type: string
  *                         format: date-time
  */
-rolesRouter.get("", rbac("admin"), authMiddleware, roleController.getAllRoles)
+rolesRouter.get("", authMiddleware, rbac("admin"), roleController.getAllRoles)
 
 /**
  * @openapi
@@ -91,7 +91,7 @@ rolesRouter.get("", rbac("admin"), authMiddleware, roleController.getAllRoles)
  *                       type: string
  *                       format: date-time
  */
-rolesRouter.post("", rbac("admin"), authMiddleware, roleController.createRole)
+rolesRouter.post("", authMiddleware, rbac("admin"), roleController.createRole)
 
 /**
  * @openapi
@@ -124,7 +124,7 @@ rolesRouter.post("", rbac("admin"), authMiddleware, roleController.createRole)
  *                   type: object
  *                   nullable: true
  */
-rolesRouter.get("/:name", rbac("admin"), authMiddleware, roleController.getRoleByName)
+rolesRouter.get("/:name", authMiddleware, rbac("admin"), roleController.getRoleByName)
 
 /**
  * @openapi
@@ -167,7 +167,7 @@ rolesRouter.get("/:name", rbac("admin"), authMiddleware, roleController.getRoleB
  *                   type: object
  *                   nullable: true
  */
-rolesRouter.put("/:id", rbac("admin"), authMiddleware, roleController.updateRole)
+rolesRouter.put("/:id", authMiddleware, rbac("admin"), roleController.updateRole)
 
 /**
  * @openapi
@@ -200,6 +200,6 @@ rolesRouter.put("/:id", rbac("admin"), authMiddleware, roleController.updateRole
  *                   type: object
  *                   nullable: true
  */
-rolesRouter.delete("/:id", rbac("admin"), authMiddleware, roleController.deleteRole)
+rolesRouter.delete("/:id", authMiddleware, rbac("admin"), roleController.deleteRole)
 
 export default rolesRouter
