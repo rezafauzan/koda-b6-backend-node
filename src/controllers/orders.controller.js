@@ -1,5 +1,5 @@
 import { httpResponse } from "../lib/http_handlers.js"
-import * as orderModel from "../models/order.model.js"
+import * as orderModel from "../models/orders.model.js"
 
 /**
  * 
@@ -15,13 +15,15 @@ export async function createPayment(request, response) {
         delivery
     } = request.body
 
-    const user_id = response.locals.userData?.id
+    const user = response.locals.userData
 
-    if (!user_id) {
+    const userId = Number(user.id);
+
+    if (!userId || isNaN(userId)) {
         return httpResponse.unauthorized(
             response,
-            "Unauthorized access"
-        )
+            "Invalid user session"
+        );
     }
 
     if (fullname === undefined || fullname.length < 4) {
@@ -60,7 +62,7 @@ export async function createPayment(request, response) {
     }
 
     try {
-        const order = await orderModel.checkoutOrder(user_id, {
+        const order = await orderModel.checkoutOrder(parseInt(userId), {
             fullname,
             phone,
             email,
