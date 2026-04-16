@@ -1,5 +1,5 @@
 import { Router } from "express"
-import * as paymentController from "../controllers/payment.controller.js"
+import * as orderController from "../controllers/orders.controller.js"
 import authMiddleware from "../middleware/auth.middleware.js"
 import rbac from "../middleware/rbac.middleware.js"
 
@@ -78,6 +78,6 @@ const paymentRouter = Router()
  *                     updated_at:
  *                       type: string
  */
-paymentRouter.post("", rbac("user", "admin"), authMiddleware, paymentController.createPayment)
+paymentRouter.post("", authMiddleware, orderController.createPayment)
 
 export default paymentRouter
