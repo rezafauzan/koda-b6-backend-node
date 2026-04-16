@@ -2,6 +2,8 @@
 
 A RESTful backend API for a coffeeshop application built with Node.js and Express. This service handles core business logic including authentication, product and order management, and file uploads. It is backed by a PostgreSQL database with Redis for caching/session management, and exposes interactive API documentation via Swagger.
 
+![RESTful API swager documentation](/assets/img/swagger.png)
+
 ---
 
 ## How to Run It
